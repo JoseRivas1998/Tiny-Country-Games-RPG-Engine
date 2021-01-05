@@ -1,0 +1,35 @@
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+
+def editorMainClass = 'com.tcg.rpgengine.editor.Main'
+
+tasks.run.workingDir = new File("../core/assets");
+tasks.run.setIgnoreExitValue(true)
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls' ]
+}
+
+application {
+    mainClassName = editorMainClass
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': editorMainClass
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+

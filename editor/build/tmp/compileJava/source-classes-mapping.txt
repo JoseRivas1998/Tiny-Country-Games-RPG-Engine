@@ -1,0 +1,2 @@
+com/tcg/rpgengine/editor/Main.java
+ com.tcg.rpgengine.editor.Main
