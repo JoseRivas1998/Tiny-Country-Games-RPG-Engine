@@ -1,29 +1,36 @@
 package com.tcg.rpgengine.editor;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.tcg.rpgengine.TCGRPGGame;
+import com.tcg.rpgengine.common.Version;
+import com.tcg.rpgengine.editor.containers.WelcomePage;
+import com.tcg.rpgengine.editor.context.ApplicationContext;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+
+    private static final int START_SCREEN_WIDTH = 600;
+    private static final int START_SCREEN_HEIGHT = 600;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
-        final VBox stackPane = new VBox(10);
-        stackPane.getChildren().add(new Label("Hello world!"));
-        final Button run_game = new Button("Run Game");
-        run_game.setOnAction(event -> {
-            LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-            config.forceExit = false;
-            new LwjglApplication(new TCGRPGGame(), config);
-        });
-        stackPane.getChildren().add(run_game);
-        primaryStage.setScene(new Scene(stackPane));
-        primaryStage.show();
+        final ApplicationContext context = ApplicationContext.context();
+        context.primaryStage = primaryStage;
+        context.primaryScene = new Scene(buildWelcomePagePane(), START_SCREEN_WIDTH, START_SCREEN_HEIGHT);
+        context.primaryStage.setScene(context.primaryScene);
+        context.primaryStage.setTitle("Tiny Country Games RPG Engine");
+        context.primaryStage.show();
+    }
+
+    private BorderPane buildWelcomePagePane() {
+        final BorderPane welcomePagePane = new BorderPane();
+        final WelcomePage welcomePage = new WelcomePage(welcomePagePane);
+        welcomePagePane.setCenter(welcomePage);
+
+        welcomePagePane.setPadding(new Insets(ApplicationContext.Constants.PADDING));
+        return welcomePagePane;
     }
 }

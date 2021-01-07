@@ -1,5 +1,5 @@
 buildscript {
-    
+
 
     repositories {
         mavenLocal()
@@ -10,7 +10,7 @@ buildscript {
         google()
     }
     dependencies {
-        
+
 
     }
 }
@@ -50,7 +50,7 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-controllers-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        
+
     }
 }
 
@@ -60,8 +60,10 @@ project(":editor") {
     apply plugin: 'application'
 
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile 'junit:junit:4.12'
         implementation project(":core")
+        implementation project(":common")
+        implementation 'org.json:json:20180130'
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         implementation "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
@@ -71,14 +73,25 @@ project(":editor") {
     }
 }
 
+project(":common") {
+    apply plugin: "java-library"
+
+    dependencies {
+        testImplementation 'junit:junit:4.13'
+        implementation 'org.json:json:20180130'
+    }
+
+}
+
 project(":core") {
     apply plugin: "java-library"
 
 
     dependencies {
+        implementation project(":common")
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        
+
     }
 }
