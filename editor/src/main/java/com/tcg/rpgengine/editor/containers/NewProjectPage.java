@@ -13,6 +13,7 @@ import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
 import org.json.JSONObject;
 
+import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -158,23 +159,25 @@ public class NewProjectPage extends BorderPane {
     private Button buildSelectButton() {
         final Button select = new Button("Select");
         select.setOnAction(event -> {
-            final String selectedDirectory = this.selectDirectory();
-            if (this.titleField.getText().isBlank()) {
-                final ApplicationContext context = ApplicationContext.context();
-                final FileHandle selectedDirectoryHandle = context.files.absolute(selectedDirectory);
-                this.titleField.setText(selectedDirectoryHandle.name());
-            }
-            this.destinationField.setText(selectedDirectory);
+            final Optional<String> optionalDirectory = this.selectDirectory();
+            optionalDirectory.ifPresent(selectedDirectory -> {
+                if (this.titleField.getText().isBlank()) {
+                    final ApplicationContext context = ApplicationContext.context();
+                    final FileHandle selectedDirectoryHandle = context.files.absolute(selectedDirectory);
+                    this.titleField.setText(selectedDirectoryHandle.name());
+                }
+                this.destinationField.setText(selectedDirectory);
+            });
         });
         return select;
     }
 
-    private String selectDirectory() {
+    private Optional<String> selectDirectory() {
         final ApplicationContext context = ApplicationContext.context();
         final FileHandle homeDirectory = context.files.external("");
         final DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(homeDirectory.file());
         final File file = directoryChooser.showDialog(context.primaryStage);
-        return file.getAbsolutePath();
+        return file == null ? Optional.empty() : Optional.of(file.getAbsolutePath());
     }
 }
