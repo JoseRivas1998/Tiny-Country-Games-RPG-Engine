@@ -16,10 +16,11 @@ public class ApplicationContext {
     public Scene primaryScene;
     public final Files files;
     public CurrentProject currentProject;
-
+    public final AppData appData;
 
     private ApplicationContext() {
         this.files = new LwjglFiles();
+        this.appData = new AppData();
     }
 
     public static ApplicationContext context() {
@@ -56,6 +57,7 @@ public class ApplicationContext {
     }
 
     private void openEditorWindow() {
+        this.appData.addOpenProject(this.currentProject.getTitle(), this.currentProject.getProjectFilePath());
         final Scene editorScene = new Scene(new EditorPane(), Constants.EDITOR_WIDTH, Constants.EDITOR_HEIGHT);
         final Stage editorStage = new Stage();
         editorStage.setTitle(String.format("Tiny Country Games RPG Engine | %s", this.currentProject.getTitle()));

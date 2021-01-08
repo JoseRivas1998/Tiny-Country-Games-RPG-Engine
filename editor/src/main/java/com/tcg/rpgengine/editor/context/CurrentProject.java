@@ -21,6 +21,10 @@ public class CurrentProject {
         return this.project.title;
     }
 
+    public String getProjectFilePath() {
+        return this.projectFilePath;
+    }
+
     static Optional<CurrentProject> selectAndOpenProject() {
         final Optional<File> optionalProjectFile = selectFile();
         if (optionalProjectFile.isPresent()) {
