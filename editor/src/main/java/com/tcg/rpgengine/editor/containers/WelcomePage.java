@@ -23,7 +23,11 @@ public class WelcomePage extends GridPane {
         final Button newProject = new Button("New Project");
         newProject.setOnAction(event -> this.parent.setCenter(new NewProjectPage(this.parent)));
 
-        final HBox buttonRow = new HBox(ApplicationContext.Constants.SPACING, newProject);
+        final Button open = new Button("Open");
+        open.setOnAction(event -> ApplicationContext.context().selectAndOpenProject());
+
+        final HBox buttonRow = new HBox(ApplicationContext.Constants.SPACING);
+        buttonRow.getChildren().addAll(newProject, open);
         buttonRow.setAlignment(Pos.CENTER_RIGHT);
         GridPane.setHgrow(buttonRow, Priority.ALWAYS);
         this.add(buttonRow, 0, 0);
