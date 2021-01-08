@@ -150,7 +150,7 @@ public class NewProjectPage extends BorderPane {
     }
 
     private void addTitleField(GridPane mainForm) {
-        mainForm.add(new Label("Title:"), 0, 0);
+        mainForm.add(new Label("Project Title:"), 0, 0);
         GridPane.setHgrow(this.titleField, Priority.ALWAYS);
         GridPane.setColumnSpan(this.titleField, 2);
         mainForm.add(this.titleField, 1, 0);
