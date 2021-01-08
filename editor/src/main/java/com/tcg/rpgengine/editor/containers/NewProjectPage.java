@@ -11,12 +11,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
-import org.json.JSONObject;
 
-import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class NewProjectPage extends BorderPane {
 
@@ -54,7 +51,8 @@ public class NewProjectPage extends BorderPane {
             final FileHandle destination = context.files.absolute(this.destinationField.getText());
             this.validateDestinationFolder(destination);
             if (this.confirmNonEmptyFolder(destination)) {
-                this.generateProjectFile(this.titleField.getText(), destination);
+                final FileHandle projectFile = this.generateProjectFile(this.titleField.getText(), destination);
+                ApplicationContext.context().openProject(projectFile);
             }
         } catch (Exception exception) {
             final ErrorDialog errorDialog = new ErrorDialog(exception);
@@ -63,7 +61,7 @@ public class NewProjectPage extends BorderPane {
         }
     }
 
-    private void generateProjectFile(String title, FileHandle destination) {
+    private FileHandle generateProjectFile(String title, FileHandle destination) {
         final String formattedTitle = title.trim().toLowerCase().replaceAll("\\s+", "-");
         final String projectFileName = String.format("%s.%s",
                 formattedTitle, ApplicationContext.Constants.PROJECT_FILE_EXTENSION);
@@ -71,6 +69,7 @@ public class NewProjectPage extends BorderPane {
         this.deleteProjectFileIfExists(projectFile);
         final Project project = Project.generateNewProject(title);
         projectFile.writeString(project.toString(), false, "UTF-8");
+        return projectFile;
     }
 
     private void deleteProjectFileIfExists(FileHandle projectFile) {
