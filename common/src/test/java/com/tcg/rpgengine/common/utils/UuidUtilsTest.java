@@ -55,9 +55,6 @@ public class UuidUtilsTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    public void failingTest() {
-        assertTrue(false);
-    }
+    
 
 }
