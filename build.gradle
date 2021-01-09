@@ -64,6 +64,7 @@ project(":editor") {
         implementation project(":core")
         implementation project(":common")
         implementation 'org.json:json:20180130'
+        implementation 'com.mpatric:mp3agic:0.9.1'
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         implementation "com.badlogicgames.gdx:gdx-controllers-desktop:$gdxVersion"
