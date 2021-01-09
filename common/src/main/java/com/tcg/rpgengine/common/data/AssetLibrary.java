@@ -52,6 +52,10 @@ public class AssetLibrary implements JSONDocument{
         this.music.put(musicAsset.id, musicAsset);
     }
 
+    public void deleteMusicAsset(MusicAsset musicAsset) {
+        this.music.remove(musicAsset.id);
+    }
+
     @Override
     public JSONObject toJSON() {
         final JSONObject jsonObject = new JSONObject();

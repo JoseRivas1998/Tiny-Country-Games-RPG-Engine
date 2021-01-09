@@ -1,6 +1,7 @@
 package com.tcg.rpgengine.editor.context;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.Project;
 import javafx.stage.FileChooser;
 
@@ -11,10 +12,18 @@ public class CurrentProject {
 
     private String projectFilePath;
     private Project project;
+    public final AssetLibrary assetLibrary;
 
     private CurrentProject(String projectFilePath, Project project) {
         this.projectFilePath = projectFilePath;
         this.project = project;
+        this.assetLibrary = this.loadAssetLibrary();
+    }
+
+    private AssetLibrary loadAssetLibrary() {
+        final FileHandle projectFileHandle = ApplicationContext.context().files.absolute(this.projectFilePath);
+        final FileHandle assetLibFile = projectFileHandle.sibling(ApplicationContext.Constants.ASSET_LIB_FILE_NAME);
+        return AssetLibrary.fromJSON(assetLibFile.readString());
     }
 
     public String getTitle() {
@@ -47,7 +56,8 @@ public class CurrentProject {
 
     static CurrentProject openProject(FileHandle projectFile) {
         validateProjectFile(projectFile);
-        return new CurrentProject(projectFile.path(), Project.generateFromJSON(projectFile.readString()));
+        return new CurrentProject(projectFile.file().getAbsolutePath(),
+                Project.generateFromJSON(projectFile.readString()));
     }
 
     private static void validateProjectFile(FileHandle projectFile) {

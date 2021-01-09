@@ -56,13 +56,15 @@ public class NewProjectPage extends BorderPane {
             this.validateDestinationFolder(destination);
             if (this.confirmNonEmptyFolder(destination)) {
                 final FileHandle projectFile = this.generateProjectFile(this.titleField.getText(), destination);
-                final FileHandle assetsFolder = projectFile.sibling("assets/");
+                final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
                 final MusicAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
 
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
 
-                final FileHandle assetLibraryFile = projectFile.sibling("asset_lib.json");
+                final FileHandle assetLibraryFile = projectFile.sibling(
+                        ApplicationContext.Constants.ASSET_LIB_FILE_NAME
+                );
                 assetLibraryFile.writeString(assetLibrary.jsonString(), false);
 
                 ApplicationContext.context().openProject(projectFile);

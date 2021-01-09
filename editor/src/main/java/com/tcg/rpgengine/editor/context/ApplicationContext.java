@@ -76,6 +76,8 @@ public class ApplicationContext {
         public static final String PROJECT_FILE_EXTENSION = "tcgproj";
         public static final double EDITOR_WIDTH = 1280.0;
         public static final double EDITOR_HEIGHT = 720.0;
+        public static final String ASSET_LIB_FILE_NAME = "asset_lib.json";
+        public static final String ASSETS_FOLDER_NAME = "assets/";
     }
 
 }
