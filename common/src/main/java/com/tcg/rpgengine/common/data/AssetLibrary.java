@@ -1,7 +1,7 @@
 package com.tcg.rpgengine.common.data;
 
 import com.tcg.rpgengine.common.data.assets.Asset;
-import com.tcg.rpgengine.common.data.assets.MusicAsset;
+import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class AssetLibrary implements JSONDocument{
 
     private static final String JSON_MUSIC_FIELD = "music";
-    private final Map<UUID, MusicAsset> music;
+    private final Map<UUID, SoundAsset> music;
 
     private AssetLibrary() {
         this.music = new HashMap<>();
@@ -26,34 +26,34 @@ public class AssetLibrary implements JSONDocument{
         final JSONArray music = jsonObject.getJSONArray(JSON_MUSIC_FIELD);
         final AssetLibrary assetLibrary = new AssetLibrary();
         for (int i = 0; i < music.length(); i++) {
-            final MusicAsset musicAsset = MusicAsset.createFromJSON(music.getJSONObject(i).toString());
-            assetLibrary.music.put(musicAsset.id, musicAsset);
+            final SoundAsset soundAsset = SoundAsset.createFromJSON(music.getJSONObject(i).toString());
+            assetLibrary.music.put(soundAsset.id, soundAsset);
         }
         return assetLibrary;
     }
 
-    public MusicAsset getMusicAssetById(UUID musicId) {
+    public SoundAsset getMusicAssetById(UUID musicId) {
         return this.music.get(Objects.requireNonNull(musicId));
     }
 
-    public List<MusicAsset> getAllMusicAssets() {
+    public List<SoundAsset> getAllMusicAssets() {
         return new ArrayList<>(this.music.values());
     }
 
-    public List<MusicAsset> getAllMusicAssetsSorted(Comparator<MusicAsset> musicAssetComparator) {
+    public List<SoundAsset> getAllMusicAssetsSorted(Comparator<SoundAsset> musicAssetComparator) {
         return this.music.values()
                 .stream()
                 .sorted(musicAssetComparator)
                 .collect(Collectors.toList());
     }
 
-    public void addMusicAsset(MusicAsset musicAsset) {
-        Objects.requireNonNull(musicAsset);
-        this.music.put(musicAsset.id, musicAsset);
+    public void addMusicAsset(SoundAsset soundAsset) {
+        Objects.requireNonNull(soundAsset);
+        this.music.put(soundAsset.id, soundAsset);
     }
 
-    public void deleteMusicAsset(MusicAsset musicAsset) {
-        this.music.remove(musicAsset.id);
+    public void deleteMusicAsset(SoundAsset soundAsset) {
+        this.music.remove(soundAsset.id);
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.util.Objects;
 import java.util.UUID;
 
-public final class MusicAsset extends Asset {
+public final class SoundAsset extends Asset {
 
     private static final String JSON_TITLE_FIELD = "title";
     private static final String JSON_PATH_FIELD = "path";
@@ -16,24 +16,24 @@ public final class MusicAsset extends Asset {
     public String path;
     public float duration;
 
-    private MusicAsset(UUID id, String title, String path, float duration) {
+    private SoundAsset(UUID id, String title, String path, float duration) {
         super(id);
         this.title = title;
         this.path = path;
         this.duration = duration;
     }
 
-    public static MusicAsset generateNewMusicAsset(String title, String path, float duration) {
-        return new MusicAsset(UuidUtils.generateUuid(), title, path, duration);
+    public static SoundAsset generateNewMusicAsset(String title, String path, float duration) {
+        return new SoundAsset(UuidUtils.generateUuid(), title, path, duration);
     }
 
-    public static MusicAsset createFromJSON(String jsonString) {
+    public static SoundAsset createFromJSON(String jsonString) {
         final JSONObject jsonObject = new JSONObject(jsonString);
         final UUID id = UuidUtils.fromString(jsonObject.getString(JSON_ID_FIELD));
         final String title = jsonObject.getString(JSON_TITLE_FIELD);
         final String path = jsonObject.getString(JSON_PATH_FIELD);
         final float duration = jsonObject.getFloat(JSON_DURATION_FIELD);
-        return new MusicAsset(id, title, path, duration);
+        return new SoundAsset(id, title, path, duration);
     }
 
     @Override
@@ -55,7 +55,7 @@ public final class MusicAsset extends Asset {
             if (obj == null || obj.getClass() != this.getClass()) {
                 result = false;
             } else {
-                final MusicAsset other = (MusicAsset) obj;
+                final SoundAsset other = (SoundAsset) obj;
                 return super.equals(other)
                         && this.title.equals(other.title)
                         && this.path.equals(other.path)

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.*;
 
-public class MusicAssetTest {
+public class SoundAssetTest {
 
     private static final String TEST_TITLE = "Test Title";
     private static final String TEST_PATH = "test_path.mp3";
@@ -16,23 +16,23 @@ public class MusicAssetTest {
 
     @Test
     public void canCreateMusicAssetFromData() {
-        MusicAsset musicAsset = MusicAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
-        assertNotNull(musicAsset);
-        assertEquals(TEST_TITLE, musicAsset.title);
-        assertEquals(TEST_PATH, musicAsset.path);
-        assertEquals(TEST_DURATION, musicAsset.duration, 1e-5f);
+        SoundAsset soundAsset = SoundAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
+        assertNotNull(soundAsset);
+        assertEquals(TEST_TITLE, soundAsset.title);
+        assertEquals(TEST_PATH, soundAsset.path);
+        assertEquals(TEST_DURATION, soundAsset.duration, 1e-5f);
     }
 
     @Test
     public void testToJSON() {
-        final MusicAsset musicAsset = MusicAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
-        final JSONObject actualJSON = musicAsset.toJSON();
+        final SoundAsset soundAsset = SoundAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
+        final JSONObject actualJSON = soundAsset.toJSON();
         this.assertJSONHasFields(actualJSON);
-        this.assertJSONFieldsEqual(musicAsset, actualJSON);
+        this.assertJSONFieldsEqual(soundAsset, actualJSON);
     }
 
-    private void assertJSONFieldsEqual(MusicAsset musicAsset, JSONObject actualJSON) {
-        assertEquals(musicAsset.id.toString(), actualJSON.getString("id"));
+    private void assertJSONFieldsEqual(SoundAsset soundAsset, JSONObject actualJSON) {
+        assertEquals(soundAsset.id.toString(), actualJSON.getString("id"));
         assertEquals(TEST_TITLE, actualJSON.getString("title"));
         assertEquals(TEST_PATH, actualJSON.getString("path"));
         assertEquals(TEST_DURATION, actualJSON.getFloat("duration"), 1e-9f);
@@ -48,37 +48,37 @@ public class MusicAssetTest {
     @Test
     public void createMusicAssetFromJSON() {
         final JSONObject expectedJSON = this.createTestAssetJSON();
-        MusicAsset musicAsset = MusicAsset.createFromJSON(expectedJSON.toString());
-        this.assertJSONFieldsEqual(musicAsset, musicAsset.toJSON());
+        SoundAsset soundAsset = SoundAsset.createFromJSON(expectedJSON.toString());
+        this.assertJSONFieldsEqual(soundAsset, soundAsset.toJSON());
     }
 
     @Test
     public void verifyHashCode() {
-        final MusicAsset musicAsset = MusicAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
-        final int expectedHash = Objects.hash(musicAsset.id, TEST_TITLE, TEST_PATH, TEST_DURATION);
-        final int actualHash = musicAsset.hashCode();
+        final SoundAsset soundAsset = SoundAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
+        final int expectedHash = Objects.hash(soundAsset.id, TEST_TITLE, TEST_PATH, TEST_DURATION);
+        final int actualHash = soundAsset.hashCode();
         assertEquals(expectedHash, actualHash);
     }
 
     @Test
     public void verifyEquals() {
         final JSONObject testAssetJSON = this.createTestAssetJSON();
-        final MusicAsset asset1 = MusicAsset.createFromJSON(testAssetJSON.toString());
-        final MusicAsset asset2 = MusicAsset.createFromJSON(testAssetJSON.toString());
+        final SoundAsset asset1 = SoundAsset.createFromJSON(testAssetJSON.toString());
+        final SoundAsset asset2 = SoundAsset.createFromJSON(testAssetJSON.toString());
 
         final JSONObject differentTitleObject = new JSONObject(testAssetJSON.toString());
         differentTitleObject.put("title", "");
-        final MusicAsset differentTitle = MusicAsset.createFromJSON(differentTitleObject.toString());
+        final SoundAsset differentTitle = SoundAsset.createFromJSON(differentTitleObject.toString());
 
         final JSONObject differentPathObject = new JSONObject(testAssetJSON.toString());
         differentPathObject.put("path", "");
-        final MusicAsset differentPath = MusicAsset.createFromJSON(differentPathObject.toString());
+        final SoundAsset differentPath = SoundAsset.createFromJSON(differentPathObject.toString());
 
         final JSONObject differentDurationObject = new JSONObject(testAssetJSON.toString());
         differentDurationObject.put("duration", 0f);
-        final MusicAsset differentDuration = MusicAsset.createFromJSON(differentDurationObject.toString());
+        final SoundAsset differentDuration = SoundAsset.createFromJSON(differentDurationObject.toString());
 
-        final MusicAsset completelyDifferent = MusicAsset.createFromJSON(this.createTestAssetJSON().toString());
+        final SoundAsset completelyDifferent = SoundAsset.createFromJSON(this.createTestAssetJSON().toString());
 
         assertEquals(asset1, asset1);
         assertEquals(asset2, asset2);
@@ -96,7 +96,7 @@ public class MusicAssetTest {
 
     }
 
-    private void assertNotEqualReflective(MusicAsset asset1, MusicAsset asset2) {
+    private void assertNotEqualReflective(SoundAsset asset1, SoundAsset asset2) {
         assertNotEquals(asset1, asset2);
         assertNotEquals(asset2, asset1);
     }

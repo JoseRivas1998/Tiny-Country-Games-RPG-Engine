@@ -3,7 +3,7 @@ package com.tcg.rpgengine.editor.containers;
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.Project;
-import com.tcg.rpgengine.common.data.assets.MusicAsset;
+import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.utils.AssetUtils;
@@ -15,7 +15,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
 
-import javax.sound.sampled.AudioSystem;
 import java.io.File;
 import java.util.Optional;
 
@@ -57,7 +56,7 @@ public class NewProjectPage extends BorderPane {
             if (this.confirmNonEmptyFolder(destination)) {
                 final FileHandle projectFile = this.generateProjectFile(this.titleField.getText(), destination);
                 final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
-                final MusicAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
+                final SoundAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
 
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
@@ -76,14 +75,14 @@ public class NewProjectPage extends BorderPane {
         }
     }
 
-    private MusicAsset copyTheme6IntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder) {
+    private SoundAsset copyTheme6IntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder) {
         final ApplicationContext context = ApplicationContext.context();
         final FileHandle initialTheme6File = context.files.internal("initial_assets/theme6.mp3");
         final FileHandle theme6AssetFile = assetsFolder.child(initialTheme6File.name());
         initialTheme6File.copyTo(theme6AssetFile);
         final String theme6Path = theme6AssetFile.path().substring(projectFile.parent().path().length() + 1);
         final float theme6Duration = AssetUtils.audioFileLength(theme6AssetFile);
-        return MusicAsset.generateNewMusicAsset("Theme 6", theme6Path, theme6Duration);
+        return SoundAsset.generateNewMusicAsset("Theme 6", theme6Path, theme6Duration);
     }
 
     private FileHandle generateProjectFile(String title, FileHandle destination) {
