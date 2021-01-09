@@ -82,7 +82,7 @@ public class NewProjectPage extends BorderPane {
         initialTheme6File.copyTo(theme6AssetFile);
         final String theme6Path = theme6AssetFile.path().substring(projectFile.parent().path().length() + 1);
         final float theme6Duration = AssetUtils.audioFileLength(theme6AssetFile);
-        return SoundAsset.generateNewMusicAsset("Theme 6", theme6Path, theme6Duration);
+        return SoundAsset.generateNewSoundAsset("Theme 6", theme6Path, theme6Duration);
     }
 
     private FileHandle generateProjectFile(String title, FileHandle destination) {

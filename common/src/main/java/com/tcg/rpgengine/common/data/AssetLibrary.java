@@ -12,9 +12,11 @@ public class AssetLibrary implements JSONDocument{
 
     private static final String JSON_MUSIC_FIELD = "music";
     private final Map<UUID, SoundAsset> music;
+    private final Map<UUID, Integer> assetReferenceCount;
 
     private AssetLibrary() {
         this.music = new HashMap<>();
+        this.assetReferenceCount = new HashMap<>();
     }
 
     public static AssetLibrary newAssetLibrary() {
@@ -53,7 +55,22 @@ public class AssetLibrary implements JSONDocument{
     }
 
     public void deleteMusicAsset(SoundAsset soundAsset) {
+        if (this.getReferenceCount(soundAsset) > 0) {
+            throw new IllegalStateException("This music asset is referenced once or more. It cannot be deleted.");
+        }
         this.music.remove(soundAsset.id);
+    }
+
+    public void incrementReferenceCount(Asset asset) {
+        this.assetReferenceCount.put(asset.id, this.getReferenceCount(asset) + 1);
+    }
+
+    public void decrementReferenceCount(Asset asset) {
+        this.assetReferenceCount.put(asset.id, Math.max(0, this.getReferenceCount(asset) - 1));
+    }
+
+    public int getReferenceCount(Asset asset) {
+        return this.assetReferenceCount.getOrDefault(asset.id, 0);
     }
 
     @Override

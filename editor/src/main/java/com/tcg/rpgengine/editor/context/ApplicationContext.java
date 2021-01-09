@@ -1,18 +1,32 @@
 package com.tcg.rpgengine.editor.context;
 
+import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Files;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
+import com.badlogic.gdx.backends.lwjgl.audio.OpenALLwjglAudio;
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.editor.components.IconBar;
 import com.tcg.rpgengine.editor.containers.AssetManagerPage;
 import com.tcg.rpgengine.editor.containers.EditorPane;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.util.Pair;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ApplicationContext {
 
+    private static final EventHandler<WindowEvent> PREVENT_CLOSE = Event::consume;
     private static ApplicationContext instance;
 
     public Stage primaryStage;
@@ -20,10 +34,12 @@ public class ApplicationContext {
     public final Files files;
     public CurrentProject currentProject;
     public final AppData appData;
+    public final Jukebox jukebox;
 
     private ApplicationContext() {
         this.files = new LwjglFiles();
         this.appData = new AppData();
+        this.jukebox = new Jukebox();
     }
 
     public static ApplicationContext context() {
@@ -76,17 +92,30 @@ public class ApplicationContext {
         this.primaryScene = editorScene;
         this.primaryStage = editorStage;
         this.primaryStage.setScene(this.primaryScene);
+        this.primaryStage.setOnCloseRequest(this.defaultStageCloseEventListener());
         this.primaryStage.show();
     }
 
     public void openAssetManager() {
         final Stage stage = new Stage();
-        final Scene scene = new Scene(new AssetManagerPage(), 600, 600);
+        final Scene scene = new Scene(new AssetManagerPage(stage), 600, 600);
         stage.setResizable(false);
         stage.setScene(scene);
         stage.setTitle("Asset Manager");
         stage.initOwner(this.primaryStage);
+        stage.setOnCloseRequest(event -> {
+            this.jukebox.stopAll();
+        });
+        this.primaryStage.setOnCloseRequest(PREVENT_CLOSE);
         stage.showAndWait();
+        this.primaryStage.setOnCloseRequest(this.defaultStageCloseEventListener());
+    }
+
+    private EventHandler<WindowEvent> defaultStageCloseEventListener() {
+        return event -> {
+            this.jukebox.stopAll();
+            this.jukebox.dispose();
+        };
     }
 
     public static class Constants {
@@ -97,6 +126,9 @@ public class ApplicationContext {
         public static final double EDITOR_HEIGHT = 720.0;
         public static final String ASSET_LIB_FILE_NAME = "asset_lib.json";
         public static final String ASSETS_FOLDER_NAME = "assets/";
+
+
+
     }
 
 }

@@ -23,7 +23,7 @@ public final class SoundAsset extends Asset {
         this.duration = duration;
     }
 
-    public static SoundAsset generateNewMusicAsset(String title, String path, float duration) {
+    public static SoundAsset generateNewSoundAsset(String title, String path, float duration) {
         return new SoundAsset(UuidUtils.generateUuid(), title, path, duration);
     }
 

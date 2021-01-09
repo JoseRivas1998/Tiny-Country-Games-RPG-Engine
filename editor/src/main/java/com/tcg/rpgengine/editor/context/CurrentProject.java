@@ -21,9 +21,15 @@ public class CurrentProject {
     }
 
     private AssetLibrary loadAssetLibrary() {
-        final FileHandle projectFileHandle = ApplicationContext.context().files.absolute(this.projectFilePath);
-        final FileHandle assetLibFile = projectFileHandle.sibling(ApplicationContext.Constants.ASSET_LIB_FILE_NAME);
-        return AssetLibrary.fromJSON(assetLibFile.readString());
+        return AssetLibrary.fromJSON(this.getAssetLibFileHandle().readString());
+    }
+
+    private FileHandle getAssetLibFileHandle() {
+        return this.getProjectFileHandle().sibling(ApplicationContext.Constants.ASSET_LIB_FILE_NAME);
+    }
+
+    public FileHandle getProjectFileHandle() {
+        return ApplicationContext.context().files.absolute(this.projectFilePath);
     }
 
     public String getTitle() {
@@ -32,6 +38,10 @@ public class CurrentProject {
 
     public String getProjectFilePath() {
         return this.projectFilePath;
+    }
+
+    public void saveAssetLibrary() {
+        this.getAssetLibFileHandle().writeString(this.assetLibrary.jsonString(), false);
     }
 
     static Optional<CurrentProject> selectAndOpenProject() {

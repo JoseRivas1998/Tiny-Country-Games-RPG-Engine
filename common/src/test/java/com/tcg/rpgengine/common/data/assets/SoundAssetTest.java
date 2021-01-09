@@ -16,7 +16,7 @@ public class SoundAssetTest {
 
     @Test
     public void canCreateMusicAssetFromData() {
-        SoundAsset soundAsset = SoundAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
+        SoundAsset soundAsset = SoundAsset.generateNewSoundAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
         assertNotNull(soundAsset);
         assertEquals(TEST_TITLE, soundAsset.title);
         assertEquals(TEST_PATH, soundAsset.path);
@@ -25,7 +25,7 @@ public class SoundAssetTest {
 
     @Test
     public void testToJSON() {
-        final SoundAsset soundAsset = SoundAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
+        final SoundAsset soundAsset = SoundAsset.generateNewSoundAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
         final JSONObject actualJSON = soundAsset.toJSON();
         this.assertJSONHasFields(actualJSON);
         this.assertJSONFieldsEqual(soundAsset, actualJSON);
@@ -54,7 +54,7 @@ public class SoundAssetTest {
 
     @Test
     public void verifyHashCode() {
-        final SoundAsset soundAsset = SoundAsset.generateNewMusicAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
+        final SoundAsset soundAsset = SoundAsset.generateNewSoundAsset(TEST_TITLE, TEST_PATH, TEST_DURATION);
         final int expectedHash = Objects.hash(soundAsset.id, TEST_TITLE, TEST_PATH, TEST_DURATION);
         final int actualHash = soundAsset.hashCode();
         assertEquals(expectedHash, actualHash);
