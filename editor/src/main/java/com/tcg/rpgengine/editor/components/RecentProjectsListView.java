@@ -29,7 +29,7 @@ public class RecentProjectsListView extends ListView<Pair<String, String>> {
                 vBox.getChildren().addAll(projectTitle, projectPath);
                 this.setGraphic(vBox);
             } else {
-                setGraphic(null);
+                this.setGraphic(null);
             }
         }
     }
