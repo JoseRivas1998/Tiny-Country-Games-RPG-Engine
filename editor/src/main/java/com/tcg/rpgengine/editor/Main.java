@@ -19,7 +19,10 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         final ApplicationContext context = ApplicationContext.context();
         context.primaryStage = primaryStage;
-        context.primaryScene = new Scene(buildWelcomePagePane(), START_SCREEN_WIDTH, START_SCREEN_HEIGHT);
+        context.primaryStage.setOnCloseRequest(event -> {
+            ApplicationContext.context().jukebox.dispose();
+        });
+        context.primaryScene = new Scene(this.buildWelcomePagePane(), START_SCREEN_WIDTH, START_SCREEN_HEIGHT);
         context.primaryStage.setScene(context.primaryScene);
         context.primaryStage.setTitle("Tiny Country Games RPG Engine");
         context.primaryStage.show();

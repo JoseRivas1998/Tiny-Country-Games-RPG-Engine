@@ -28,6 +28,8 @@ public class SoundAssetListView extends ListView<SoundAsset> {
                 final VBox vBox = new VBox(ApplicationContext.Constants.SPACING);
                 vBox.getChildren().addAll(soundTitle, soundPath);
                 this.setGraphic(vBox);
+            } else {
+                this.setGraphic(null);
             }
         }
     }

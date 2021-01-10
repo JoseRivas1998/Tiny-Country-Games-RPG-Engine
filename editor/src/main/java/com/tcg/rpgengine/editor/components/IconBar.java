@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 
 public class IconBar extends MenuBar {
@@ -24,6 +25,7 @@ public class IconBar extends MenuBar {
         assetManagerButton.setOnAction(event -> {
             ApplicationContext.context().openAssetManager();
         });
+        assetManagerButton.setTooltip(new Tooltip("Asset Manager"));
         assetManager.setGraphic(assetManagerButton);
         assetManager.setStyle("-fx-background-color: transparent;");
         return assetManager;

@@ -1,6 +1,7 @@
 package com.tcg.rpgengine.common.data;
 
 import com.tcg.rpgengine.common.data.assets.Asset;
+import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,11 +12,15 @@ import java.util.stream.Collectors;
 public class AssetLibrary implements JSONDocument{
 
     private static final String JSON_MUSIC_FIELD = "music";
+    private static final String JSON_IMAGES_FIELD = "images";
     private final Map<UUID, SoundAsset> music;
+    private final Map<UUID, ImageAsset> images;
+
     private final Map<UUID, Integer> assetReferenceCount;
 
     private AssetLibrary() {
         this.music = new HashMap<>();
+        this.images = new HashMap<>();
         this.assetReferenceCount = new HashMap<>();
     }
 
@@ -26,10 +31,15 @@ public class AssetLibrary implements JSONDocument{
     public static AssetLibrary fromJSON(String jsonString) {
         final JSONObject jsonObject = new JSONObject(Objects.requireNonNull(jsonString));
         final JSONArray music = jsonObject.getJSONArray(JSON_MUSIC_FIELD);
+        final JSONArray images = jsonObject.getJSONArray(JSON_IMAGES_FIELD);
         final AssetLibrary assetLibrary = new AssetLibrary();
         for (int i = 0; i < music.length(); i++) {
             final SoundAsset soundAsset = SoundAsset.createFromJSON(music.getJSONObject(i).toString());
             assetLibrary.music.put(soundAsset.id, soundAsset);
+        }
+        for (int i = 0; i < images.length(); i++) {
+            final ImageAsset imageAsset = ImageAsset.createFromJSON(images.getJSONObject(i).toString());
+            assetLibrary.images.put(imageAsset.id, imageAsset);
         }
         return assetLibrary;
     }
@@ -55,10 +65,31 @@ public class AssetLibrary implements JSONDocument{
     }
 
     public void deleteMusicAsset(SoundAsset soundAsset) {
-        if (this.getReferenceCount(soundAsset) > 0) {
-            throw new IllegalStateException("This music asset is referenced once or more. It cannot be deleted.");
-        }
+        this.verifyReferenceCount(soundAsset);
         this.music.remove(soundAsset.id);
+    }
+
+    public ImageAsset getImageAssetById(UUID imageId) {
+        return this.images.get(Objects.requireNonNull(imageId));
+    }
+
+    public List<ImageAsset> getAllImageAssets() {
+        return new ArrayList<>(this.images.values());
+    }
+
+    public void addImageAsset(ImageAsset asset) {
+        this.images.put(asset.id, asset);
+    }
+
+    public void deleteImageAsset(ImageAsset asset) {
+        this.verifyReferenceCount(asset);
+        this.images.remove(asset.id);
+    }
+
+    private void verifyReferenceCount(Asset asset) {
+        if (this.getReferenceCount(asset) > 0) {
+            throw new IllegalStateException("This asset is referenced once or more. It cannot be deleted.");
+        }
     }
 
     public void incrementReferenceCount(Asset asset) {
@@ -78,6 +109,8 @@ public class AssetLibrary implements JSONDocument{
         final JSONObject jsonObject = new JSONObject();
 
         jsonObject.put(JSON_MUSIC_FIELD, this.assetCollectionToJSONArray(this.music.values()));
+
+        jsonObject.put(JSON_IMAGES_FIELD, this.assetCollectionToJSONArray(this.images.values()));
 
         return jsonObject;
     }

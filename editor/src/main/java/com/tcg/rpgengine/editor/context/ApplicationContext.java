@@ -1,11 +1,7 @@
 package com.tcg.rpgengine.editor.context;
 
-import com.badlogic.gdx.Audio;
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
-import com.badlogic.gdx.backends.lwjgl.audio.OpenALLwjglAudio;
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.editor.components.IconBar;
 import com.tcg.rpgengine.editor.containers.AssetManagerPage;
@@ -15,14 +11,8 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Pair;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ApplicationContext {
 
@@ -55,8 +45,10 @@ public class ApplicationContext {
 
     public void selectAndOpenProject() {
         try {
-            CurrentProject.selectAndOpenProject().ifPresent(newOpenProject -> this.currentProject = newOpenProject);
-            this.openEditorWindow();
+            CurrentProject.selectAndOpenProject().ifPresent(newOpenProject -> {
+                this.currentProject = newOpenProject;
+                this.openEditorWindow();
+            });
         } catch (Exception exception) {
             exception.printStackTrace();
             final ErrorDialog errorDialog = new ErrorDialog(exception);

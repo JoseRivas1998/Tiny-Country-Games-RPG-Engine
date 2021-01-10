@@ -95,7 +95,7 @@ public class MusicTab extends Tab {
 
     private void importMusic(Stage owner) {
         final FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(ExtensionUtils.supportedMusicFiles());
+        fileChooser.getExtensionFilters().addAll(ExtensionUtils.supportedSoundFiles());
         final Optional<File> selectedFileOptional = Optional.ofNullable(fileChooser.showOpenDialog(owner));
         selectedFileOptional.ifPresent(selectedFile -> {
             final ApplicationContext context = ApplicationContext.context();
@@ -162,7 +162,7 @@ public class MusicTab extends Tab {
         if (!selectedFileHandle.exists()) {
             throw new IllegalArgumentException("Selected file does not exist.");
         }
-        if (!ExtensionUtils.extensionMatches(selectedFileHandle.extension())) {
+        if (!ExtensionUtils.soundExtensionMatches(selectedFileHandle.extension())) {
             throw new IllegalArgumentException("Selected file type is not supported.");
         }
         return selectedFileHandle;

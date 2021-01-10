@@ -3,6 +3,7 @@ package com.tcg.rpgengine.editor.containers;
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.Project;
+import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
@@ -56,10 +57,14 @@ public class NewProjectPage extends BorderPane {
             if (this.confirmNonEmptyFolder(destination)) {
                 final FileHandle projectFile = this.generateProjectFile(this.titleField.getText(), destination);
                 final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
+
                 final SoundAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
+                final ImageAsset titleImage = this.copyTitleImageIntoProjectFolder(projectFile, assetsFolder);
+
 
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
+                assetLibrary.addImageAsset(titleImage);
 
                 final FileHandle assetLibraryFile = projectFile.sibling(
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
@@ -73,6 +78,15 @@ public class NewProjectPage extends BorderPane {
             errorDialog.initOwner(context.primaryStage);
             errorDialog.showAndWait();
         }
+    }
+
+    private ImageAsset copyTitleImageIntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder) {
+        final ApplicationContext context = ApplicationContext.context();
+        final FileHandle initialTitleFile = context.files.internal("initial_assets/title.png");
+        final FileHandle titleAssetFile = assetsFolder.child(initialTitleFile.name());
+        initialTitleFile.copyTo(titleAssetFile);
+        final String titlePath = titleAssetFile.path().substring(projectFile.parent().path().length() + 1);
+        return ImageAsset.generateNewImageAsset(titlePath);
     }
 
     private SoundAsset copyTheme6IntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder) {

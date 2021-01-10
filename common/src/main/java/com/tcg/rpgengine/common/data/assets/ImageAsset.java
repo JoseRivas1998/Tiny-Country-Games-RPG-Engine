@@ -20,7 +20,7 @@ public class ImageAsset extends Asset{
         return new ImageAsset(UuidUtils.generateUuid(), path);
     }
 
-    public static ImageAsset generateFromJSON(String jsonString) {
+    public static ImageAsset createFromJSON(String jsonString) {
         final JSONObject imageJSON = new JSONObject(jsonString);
         final UUID id = UuidUtils.fromString(imageJSON.getString(JSON_ID_FIELD));
         final String path = imageJSON.getString(JSON_PATH_FIELD);

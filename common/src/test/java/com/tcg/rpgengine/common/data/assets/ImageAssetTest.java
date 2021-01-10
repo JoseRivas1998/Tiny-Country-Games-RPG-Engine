@@ -1,9 +1,7 @@
 package com.tcg.rpgengine.common.data.assets;
 
-import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.mockito.internal.matchers.Null;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -38,7 +36,7 @@ public class ImageAssetTest {
         final JSONObject imageJSON = new JSONObject();
         imageJSON.put("id", imageId);
         imageJSON.put("path", TEST_IMAGE_PATH);
-        final ImageAsset imageAsset = ImageAsset.generateFromJSON(imageJSON.toString());
+        final ImageAsset imageAsset = ImageAsset.createFromJSON(imageJSON.toString());
         assertNotNull(imageAsset);
         assertEquals(imageId, imageAsset.id);
         assertEquals(TEST_IMAGE_PATH, imageAsset.path);
@@ -64,14 +62,14 @@ public class ImageAssetTest {
         assetJSON.put("id", id.toString());
         assetJSON.put("path", TEST_IMAGE_PATH);
 
-        final ImageAsset image1 = ImageAsset.generateFromJSON(assetJSON.toString());
-        final ImageAsset image2 = ImageAsset.generateFromJSON(assetJSON.toString());
+        final ImageAsset image1 = ImageAsset.createFromJSON(assetJSON.toString());
+        final ImageAsset image2 = ImageAsset.createFromJSON(assetJSON.toString());
 
         final ImageAsset differentId = ImageAsset.generateNewImageAsset(TEST_IMAGE_PATH);
 
         final JSONObject differentPathJSON = new JSONObject(assetJSON.toString());
         differentPathJSON.put("path", "different path");
-        final ImageAsset differentPath = ImageAsset.generateFromJSON(differentPathJSON.toString());
+        final ImageAsset differentPath = ImageAsset.createFromJSON(differentPathJSON.toString());
 
         final ImageAsset completelyDifferent = ImageAsset.generateNewImageAsset("completely different");
 

@@ -28,6 +28,8 @@ public class RecentProjectsListView extends ListView<Pair<String, String>> {
                 final VBox vBox = new VBox(ApplicationContext.Constants.SPACING);
                 vBox.getChildren().addAll(projectTitle, projectPath);
                 this.setGraphic(vBox);
+            } else {
+                setGraphic(null);
             }
         }
     }
