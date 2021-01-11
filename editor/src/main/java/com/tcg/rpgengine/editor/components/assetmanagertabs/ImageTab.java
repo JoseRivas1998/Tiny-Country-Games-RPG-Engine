@@ -8,6 +8,7 @@ import com.tcg.rpgengine.editor.context.CurrentProject;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.utils.ExtensionUtils;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
@@ -15,10 +16,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.util.Optional;
@@ -29,43 +32,12 @@ public class ImageTab extends Tab {
     private final Button remove;
     private final Button preview;
 
-    public ImageTab(Stage owner) {
+    public ImageTab(Window owner) {
         super("Images");
 
         this.imageAssetListView = this.buildImageAssetListView();
         this.remove = this.buildRemoveButton(owner);
-
-        final Button preview = new Button("Preview");
-        preview.setMaxWidth(Double.MAX_VALUE);
-        preview.setDisable(true);
-        preview.setOnAction(event -> {
-            this.selectedImage().ifPresent(selectedImage -> {
-                try {
-                    final ApplicationContext context = ApplicationContext.context();
-                    final FileHandle projectFileHandle = context.currentProject.getProjectFileHandle();
-                    final FileHandle imageFile = projectFileHandle.sibling(selectedImage.path);
-                    final Image image = new Image(imageFile.read());
-                    final Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle(imageFile.name());
-                    alert.setHeaderText(null);
-                    alert.setContentText(null);
-                    alert.setGraphic(null);
-                    final ImageView imageView = new ImageView(image);
-                    alert.getDialogPane().setContent(imageView);
-                    alert.getDialogPane().setPadding(new Insets(ApplicationContext.Constants.PADDING));
-                    alert.initOwner(owner);
-                    alert.showAndWait();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    final ErrorDialog errorDialog = new ErrorDialog(e);
-                    errorDialog.initOwner(owner);
-                    errorDialog.showAndWait();
-                }
-            });
-        });
-
-
-        this.preview = preview;
+        this.preview = this.buildPreviewButton(owner);
 
         final VBox buttonBox = new VBox(ApplicationContext.Constants.SPACING);
         buttonBox.getChildren().addAll(
@@ -86,7 +58,50 @@ public class ImageTab extends Tab {
         this.setClosable(false);
     }
 
-    private Button buildRemoveButton(Stage owner) {
+    private Button buildPreviewButton(Window owner) {
+        final Button preview = new Button("Preview");
+        preview.setMaxWidth(Double.MAX_VALUE);
+        preview.setDisable(true);
+        preview.setOnAction(event -> this.previewImageIfSelected(owner));
+        return preview;
+    }
+
+    private void previewImageIfSelected(Window owner) {
+        this.selectedImage().ifPresent(selectedImage -> this.previewSelectedImage(owner, selectedImage));
+    }
+
+    private void previewSelectedImage(Window owner, ImageAsset selectedImage) {
+        try {
+            final ApplicationContext context = ApplicationContext.context();
+            final FileHandle projectFileHandle = context.currentProject.getProjectFileHandle();
+            final FileHandle imageFile = projectFileHandle.sibling(selectedImage.path);
+
+            final StackPane stackPane = new StackPane();
+            stackPane.setPadding(new Insets(ApplicationContext.Constants.PADDING));
+            final Scene scene = new Scene(stackPane, ApplicationContext.Constants.EDITOR_WIDTH / 2, ApplicationContext.Constants.EDITOR_HEIGHT / 2);
+
+            final Image image = new Image(imageFile.read());
+            final ImageView imageView = new ImageView(image);
+            imageView.setPreserveRatio(true);
+            imageView.fitWidthProperty().bind(scene.widthProperty().subtract(ApplicationContext.Constants.PADDING * 2));
+            imageView.fitHeightProperty().bind(scene.heightProperty().subtract(ApplicationContext.Constants.PADDING * 2));
+            stackPane.getChildren().addAll(imageView);
+
+            final Stage stage = new Stage();
+            stage.setTitle(selectedImage.path);
+            stage.setScene(scene);
+            stage.initOwner(owner);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+            final ErrorDialog errorDialog = new ErrorDialog(e);
+            errorDialog.initOwner(owner);
+            errorDialog.showAndWait();
+        }
+    }
+
+    private Button buildRemoveButton(Window owner) {
         final Button remove = new Button("Remove");
         remove.setMaxWidth(Double.MAX_VALUE);
         remove.setDisable(true);
@@ -94,7 +109,7 @@ public class ImageTab extends Tab {
         return remove;
     }
 
-    private void removeSelectedImage(Stage owner) {
+    private void removeSelectedImage(Window owner) {
         this.selectedImage().ifPresent(selectedImage -> {
             try {
                 final ApplicationContext context = ApplicationContext.context();
@@ -114,14 +129,14 @@ public class ImageTab extends Tab {
         });
     }
 
-    private Button buildImportButton(Stage owner) {
+    private Button buildImportButton(Window owner) {
         final Button importButton = new Button("Import");
         importButton.setMaxWidth(Double.MAX_VALUE);
         importButton.setOnAction(event -> this.importImage(owner));
         return importButton;
     }
 
-    private void importImage(Stage owner) {
+    private void importImage(Window owner) {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().setAll(ExtensionUtils.supportedImageFiles());
         final Optional<File> selectedFileOptional = Optional.ofNullable(fileChooser.showOpenDialog(owner));
