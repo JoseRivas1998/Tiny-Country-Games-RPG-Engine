@@ -6,6 +6,7 @@ import com.tcg.rpgengine.editor.components.SimpleAssetListView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.context.CurrentProject;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
+import com.tcg.rpgengine.editor.dialogs.ImagePreviewDialog;
 import com.tcg.rpgengine.editor.utils.ExtensionUtils;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -14,10 +15,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -75,24 +74,11 @@ public class ImageTab extends Tab {
             final ApplicationContext context = ApplicationContext.context();
             final FileHandle projectFileHandle = context.currentProject.getProjectFileHandle();
             final FileHandle imageFile = projectFileHandle.sibling(selectedImage.path);
-
-            final StackPane stackPane = new StackPane();
-            stackPane.setPadding(new Insets(ApplicationContext.Constants.PADDING));
-            final Scene scene = new Scene(stackPane, ApplicationContext.Constants.EDITOR_WIDTH / 2, ApplicationContext.Constants.EDITOR_HEIGHT / 2);
-
-            final Image image = new Image(imageFile.read());
-            final ImageView imageView = new ImageView(image);
-            imageView.setPreserveRatio(true);
-            imageView.fitWidthProperty().bind(scene.widthProperty().subtract(ApplicationContext.Constants.PADDING * 2));
-            imageView.fitHeightProperty().bind(scene.heightProperty().subtract(ApplicationContext.Constants.PADDING * 2));
-            stackPane.getChildren().addAll(imageView);
-
-            final Stage stage = new Stage();
-            stage.setTitle(selectedImage.path);
-            stage.setScene(scene);
-            stage.initOwner(owner);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.showAndWait();
+            final ImagePreviewDialog previewDialog = new ImagePreviewDialog(imageFile);
+            previewDialog.setTitle(selectedImage.path);
+            previewDialog.initOwner(owner);
+            previewDialog.initModality(Modality.APPLICATION_MODAL);
+            previewDialog.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
             final ErrorDialog errorDialog = new ErrorDialog(e);
