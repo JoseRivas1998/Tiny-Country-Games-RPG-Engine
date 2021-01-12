@@ -3,15 +3,31 @@ package com.tcg.rpgengine.common.data.assets;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.tcg.rpgengine.common.TestUtils.assertJSONObjectsEquals;
 import static org.junit.Assert.*;
-import static com.tcg.rpgengine.common.TestUtils.*;
 
 public class ImageAssetTest {
 
     private static final String TEST_IMAGE_PATH = "test_image.png";
+    private static final byte[] TEST_BYTES = {
+            // uuid (8f05d644-b2ac-4da8-9359-624b4ea11fed)
+            (byte) 0x8f, (byte) 0x05, (byte) 0xd6, (byte) 0x44,
+            (byte) 0xb2, (byte) 0xac,
+            (byte) 0x4d, (byte) 0xa8,
+            (byte) 0x93, (byte) 0x59,
+            (byte) 0x62, (byte) 0x4b, (byte) 0x4e, (byte) 0xa1, (byte) 0x1f, (byte) 0xed,
+            // path length (14)
+            0x00, 0x00, 0x00, 0x0e,
+            // path
+            (byte) 0x74, (byte) 0x65, (byte) 0x73, (byte) 0x74,
+            (byte) 0x5f, (byte) 0x69, (byte) 0x6d, (byte) 0x61,
+            (byte) 0x67, (byte) 0x65, (byte) 0x2e, (byte) 0x70,
+            (byte) 0x6e, (byte) 0x67
+    };
 
     @Test
     public void canCreateImageAsset() {
@@ -90,6 +106,33 @@ public class ImageAssetTest {
     private void assertNotEqualsReflective(ImageAsset image1, ImageAsset image2) {
         assertNotEquals(image1, image2);
         assertNotEquals(image2, image1);
+    }
+
+    @Test
+    public void verifyContentLength() {
+        final ImageAsset imageAsset = ImageAsset.generateNewImageAsset(TEST_IMAGE_PATH);
+        final int expected = 18;
+        final int actual = imageAsset.contentLength();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void verifyBytes() {
+        final UUID imageId = UUID.fromString("8f05d644-b2ac-4da8-9359-624b4ea11fed");
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", imageId.toString());
+        jsonObject.put("path", TEST_IMAGE_PATH);
+        final ImageAsset imageAsset = ImageAsset.createFromJSON(jsonObject.toString());
+        final byte[] actualBytes = imageAsset.toBytes();
+        assertArrayEquals(TEST_BYTES, actualBytes);
+    }
+
+    @Test
+    public void verifyDecode() {
+        final UUID imageId = UUID.fromString("8f05d644-b2ac-4da8-9359-624b4ea11fed");
+        ImageAsset image = ImageAsset.createFromBytes(ByteBuffer.wrap(TEST_BYTES));
+        assertEquals(imageId, image.id);
+        assertEquals(TEST_IMAGE_PATH, image.path);
     }
 
 }

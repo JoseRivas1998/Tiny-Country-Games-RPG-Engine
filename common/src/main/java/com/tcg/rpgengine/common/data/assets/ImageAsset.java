@@ -1,5 +1,6 @@
 package com.tcg.rpgengine.common.data.assets;
 
+import com.tcg.rpgengine.common.data.BinaryDocument;
 import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
@@ -7,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ImageAsset extends Asset{
+public class ImageAsset extends Asset {
 
     private static final String JSON_PATH_FIELD = "path";
     public String path;
@@ -28,6 +29,12 @@ public class ImageAsset extends Asset{
         return new ImageAsset(id, path);
     }
 
+    public static ImageAsset createFromBytes(ByteBuffer bytes) {
+        final UUID id = BinaryDocument.getUuid(bytes);
+        final String path = BinaryDocument.getUTF8String(bytes);
+        return new ImageAsset(id, path);
+    }
+
     @Override
     protected void addAdditionalJSONData(JSONObject jsonObject) {
         jsonObject.put(JSON_PATH_FIELD, this.path);
@@ -35,12 +42,12 @@ public class ImageAsset extends Asset{
 
     @Override
     protected int contentLength() {
-        return 0;
+        return Integer.BYTES + this.path.length();
     }
 
     @Override
     protected void encodeContent(ByteBuffer byteBuffer) {
-
+        BinaryDocument.putUTF8String(byteBuffer, this.path);
     }
 
     @Override

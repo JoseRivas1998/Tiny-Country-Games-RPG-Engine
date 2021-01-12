@@ -1,10 +1,10 @@
 package com.tcg.rpgengine.common.data.assets;
 
+import com.tcg.rpgengine.common.data.BinaryDocument;
 import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,23 +39,14 @@ public final class SoundAsset extends Asset {
     }
 
     public static SoundAsset createFromBytes(ByteBuffer bytes) {
-        final byte[] idBytes = new byte[UuidUtils.UUID_NUMBER_OF_BYTES];
-        bytes.get(idBytes);
-        final UUID id = UuidUtils.fromBytes(idBytes);
-
-        final int titleLength = bytes.getInt();
-        final byte[] titleBytes = new byte[titleLength];
-        bytes.get(titleBytes);
-        final String title = new String(titleBytes, StandardCharsets.UTF_8);
-
-        final int pathLength = bytes.getInt();
-        final byte[] pathBytes = new byte[pathLength];
-        bytes.get(pathBytes);
-        final String path = new String(pathBytes, StandardCharsets.UTF_8);
-
+        final UUID id = BinaryDocument.getUuid(bytes);
+        final String title = BinaryDocument.getUTF8String(bytes);
+        final String path = BinaryDocument.getUTF8String(bytes);
         final float duration = bytes.getFloat();
         return new SoundAsset(id, title, path, duration);
     }
+
+
 
     @Override
     protected void addAdditionalJSONData(JSONObject jsonObject) {
@@ -71,15 +62,9 @@ public final class SoundAsset extends Asset {
 
     @Override
     protected void encodeContent(ByteBuffer byteBuffer) {
-        this.putString(byteBuffer, this.title);
-        this.putString(byteBuffer, this.path);
+        BinaryDocument.putUTF8String(byteBuffer, this.title);
+        BinaryDocument.putUTF8String(byteBuffer, this.path);
         byteBuffer.putFloat(this.duration);
-    }
-
-    private void putString(ByteBuffer byteBuffer, String string) {
-        final byte[] stringBytes = string.getBytes(StandardCharsets.UTF_8);
-        byteBuffer.putInt(stringBytes.length);
-        byteBuffer.put(stringBytes);
     }
 
     @Override

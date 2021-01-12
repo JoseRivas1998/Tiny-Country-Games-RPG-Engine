@@ -6,6 +6,7 @@ import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,6 +25,8 @@ public abstract class Asset implements JSONDocument, BinaryDocument {
 
     protected abstract int contentLength();
     protected abstract void encodeContent(ByteBuffer byteBuffer);
+
+
 
     @Override
     public JSONObject toJSON() {
