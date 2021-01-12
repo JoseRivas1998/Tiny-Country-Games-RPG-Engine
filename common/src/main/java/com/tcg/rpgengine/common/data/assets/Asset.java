@@ -1,12 +1,17 @@
 package com.tcg.rpgengine.common.data.assets;
 
+import com.tcg.rpgengine.common.data.BinaryDocument;
 import com.tcg.rpgengine.common.data.JSONDocument;
+import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class Asset implements JSONDocument {
+public abstract class Asset implements JSONDocument, BinaryDocument {
+
+    public final static int HEADER_NUMBER_OF_BYTES = UuidUtils.UUID_NUMBER_OF_BYTES + Integer.BYTES;
 
     protected static final String JSON_ID_FIELD = "id";
     public final UUID id;
@@ -17,12 +22,25 @@ public abstract class Asset implements JSONDocument {
 
     protected abstract void addAdditionalJSONData(JSONObject jsonObject);
 
+    protected abstract int contentLength();
+    protected abstract void encodeContent(ByteBuffer byteBuffer);
+
     @Override
     public JSONObject toJSON() {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put(JSON_ID_FIELD, this.id.toString());
         this.addAdditionalJSONData(jsonObject);
         return jsonObject;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[Asset.HEADER_NUMBER_OF_BYTES + this.contentLength()]);
+        byteBuffer.put(UuidUtils.toBytes(this.id));
+        byteBuffer.position(UuidUtils.UUID_NUMBER_OF_BYTES);
+        byteBuffer.putInt(this.contentLength());
+        this.encodeContent(byteBuffer);
+        return byteBuffer.array();
     }
 
     @Override

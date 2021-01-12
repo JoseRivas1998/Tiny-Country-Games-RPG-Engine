@@ -3,6 +3,7 @@ package com.tcg.rpgengine.common.data.assets;
 import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -30,6 +31,16 @@ public class ImageAsset extends Asset{
     @Override
     protected void addAdditionalJSONData(JSONObject jsonObject) {
         jsonObject.put(JSON_PATH_FIELD, this.path);
+    }
+
+    @Override
+    protected int contentLength() {
+        return 0;
+    }
+
+    @Override
+    protected void encodeContent(ByteBuffer byteBuffer) {
+
     }
 
     @Override

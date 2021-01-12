@@ -8,7 +8,7 @@ import java.util.UUID;
 public class UuidUtils {
 
     private static final Set<UUID> generatedUuids = new HashSet<>();
-    public static final int UUID_NUMBER_OF_BYTES = 16;
+    public static final int UUID_NUMBER_OF_BYTES = Long.BYTES * 2;
 
     public static UUID generateUuid() {
         UUID uuid;

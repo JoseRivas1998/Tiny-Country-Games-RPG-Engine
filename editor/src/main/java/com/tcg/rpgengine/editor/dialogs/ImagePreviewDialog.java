@@ -28,7 +28,7 @@ public class ImagePreviewDialog extends Stage {
         imageView.fitHeightProperty().bind(scene.heightProperty().subtract(doublePadding));
         stackPane.getChildren().addAll(imageView);
 
-        setScene(scene);
+        this.setScene(scene);
     }
 
 }

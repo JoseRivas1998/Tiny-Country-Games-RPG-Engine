@@ -3,6 +3,7 @@ package com.tcg.rpgengine.common.data.assets;
 import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -41,6 +42,16 @@ public final class SoundAsset extends Asset {
         jsonObject.put(JSON_TITLE_FIELD, this.title);
         jsonObject.put(JSON_PATH_FIELD, this.path);
         jsonObject.put(JSON_DURATION_FIELD, this.duration);
+    }
+
+    @Override
+    protected int contentLength() {
+        return 0;
+    }
+
+    @Override
+    protected void encodeContent(ByteBuffer byteBuffer) {
+
     }
 
     @Override
