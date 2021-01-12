@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AssetLibrary implements JSONDocument{
+public class AssetLibrary implements JSONDocument {
 
     private static final String JSON_MUSIC_FIELD = "music";
     private static final String JSON_IMAGES_FIELD = "images";
@@ -45,7 +45,7 @@ public class AssetLibrary implements JSONDocument{
     }
 
     public SoundAsset getMusicAssetById(UUID musicId) {
-        return this.music.get(Objects.requireNonNull(musicId));
+        return getNonNullAsset(musicId, this.music);
     }
 
     public List<SoundAsset> getAllMusicAssets() {
@@ -70,7 +70,7 @@ public class AssetLibrary implements JSONDocument{
     }
 
     public ImageAsset getImageAssetById(UUID imageId) {
-        return this.images.get(Objects.requireNonNull(imageId));
+        return getNonNullAsset(imageId, this.images);
     }
 
     public List<ImageAsset> getAllImageAssets() {
@@ -102,6 +102,10 @@ public class AssetLibrary implements JSONDocument{
 
     public int getReferenceCount(Asset asset) {
         return this.assetReferenceCount.getOrDefault(asset.id, 0);
+    }
+
+    private static <T extends Asset> T getNonNullAsset(UUID assetId, Map<UUID, T> assetMap) {
+        return Objects.requireNonNull(assetMap.get(Objects.requireNonNull(assetId)));
     }
 
     @Override

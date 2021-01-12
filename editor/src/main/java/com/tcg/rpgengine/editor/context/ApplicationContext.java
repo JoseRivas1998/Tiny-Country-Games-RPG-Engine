@@ -5,13 +5,17 @@ import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.editor.components.IconBar;
 import com.tcg.rpgengine.editor.containers.AssetManagerPage;
+import com.tcg.rpgengine.editor.containers.DatabaseManagerPage;
 import com.tcg.rpgengine.editor.containers.EditorPane;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Dialog;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 
 public class ApplicationContext {
@@ -90,17 +94,28 @@ public class ApplicationContext {
 
     public void openAssetManager() {
         final Stage stage = new Stage();
-        final Scene scene = new Scene(new AssetManagerPage(stage), 600, 600);
+        final Scene scene = new Scene(new AssetManagerPage(stage),
+                Constants.ASSET_MANAGER_WIDTH, Constants.ASSET_MANAGER_HEIGHT);
         stage.setResizable(false);
         stage.setScene(scene);
         stage.setTitle("Asset Manager");
         stage.initOwner(this.primaryStage);
+        stage.initModality(Modality.APPLICATION_MODAL);
         stage.setOnCloseRequest(event -> {
             this.jukebox.stopAll();
         });
-        this.primaryStage.setOnCloseRequest(PREVENT_CLOSE);
         stage.showAndWait();
-        this.primaryStage.setOnCloseRequest(this.defaultStageCloseEventListener());
+    }
+
+    public void openDatabaseManager() {
+        final Stage stage = new Stage();
+        final Scene scene = new Scene(new DatabaseManagerPage(stage), Constants.EDITOR_WIDTH, Constants.EDITOR_HEIGHT);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.setTitle("Database Manager");
+        stage.initOwner(this.primaryStage);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.showAndWait();
     }
 
     private EventHandler<WindowEvent> defaultStageCloseEventListener() {
@@ -118,9 +133,9 @@ public class ApplicationContext {
         public static final double EDITOR_HEIGHT = 720.0;
         public static final String ASSET_LIB_FILE_NAME = "asset_lib.json";
         public static final String ASSETS_FOLDER_NAME = "assets/";
-
-
-
+        public static final String SYSTEM_FILE_NAME = "system.json";
+        public static final int ASSET_MANAGER_WIDTH = 600;
+        public static final int ASSET_MANAGER_HEIGHT = 600;
     }
 
 }

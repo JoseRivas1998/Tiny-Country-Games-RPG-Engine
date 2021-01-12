@@ -5,10 +5,11 @@ import com.tcg.rpgengine.editor.components.assetmanagertabs.MusicTab;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 public class AssetManagerPage extends TabPane {
 
-    public AssetManagerPage(Stage stage) {
+    public AssetManagerPage(Window stage) {
         super();
         this.getTabs().addAll(
                 new MusicTab(stage),

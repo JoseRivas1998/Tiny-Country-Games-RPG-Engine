@@ -3,6 +3,7 @@ package com.tcg.rpgengine.editor.context;
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.Project;
+import com.tcg.rpgengine.common.data.system.SystemData;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -10,14 +11,24 @@ import java.util.Optional;
 
 public class CurrentProject {
 
-    private String projectFilePath;
-    private Project project;
+    private final String projectFilePath;
+    private final Project project;
     public final AssetLibrary assetLibrary;
+    public final SystemData systemData;
 
     private CurrentProject(String projectFilePath, Project project) {
         this.projectFilePath = projectFilePath;
         this.project = project;
         this.assetLibrary = this.loadAssetLibrary();
+        this.systemData = this.loadSystemData();
+    }
+
+    private SystemData loadSystemData() {
+        return SystemData.createFromJSON(this.assetLibrary, this.getSystemDataFileHandle().readString());
+    }
+
+    private FileHandle getSystemDataFileHandle() {
+        return this.getProjectFileHandle().sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
     }
 
     private AssetLibrary loadAssetLibrary() {
@@ -42,6 +53,10 @@ public class CurrentProject {
 
     public void saveAssetLibrary() {
         this.getAssetLibFileHandle().writeString(this.assetLibrary.jsonString(), false);
+    }
+
+    public void saveSystemData() {
+        this.getSystemDataFileHandle().writeString(this.systemData.jsonString(), false);
     }
 
     static Optional<CurrentProject> selectAndOpenProject() {

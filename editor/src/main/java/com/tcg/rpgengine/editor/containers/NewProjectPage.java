@@ -5,6 +5,8 @@ import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.Project;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
+import com.tcg.rpgengine.common.data.system.SystemData;
+import com.tcg.rpgengine.common.data.system.Title;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.utils.AssetUtils;
@@ -55,12 +57,13 @@ public class NewProjectPage extends BorderPane {
             final FileHandle destination = context.files.absolute(this.destinationField.getText());
             this.validateDestinationFolder(destination);
             if (this.confirmNonEmptyFolder(destination)) {
-                final FileHandle projectFile = this.generateProjectFile(this.titleField.getText(), destination);
+                final String projTitle = this.titleField.getText();
+
+                final FileHandle projectFile = this.generateProjectFile(projTitle, destination);
                 final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
 
                 final SoundAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
                 final ImageAsset titleImage = this.copyTitleImageIntoProjectFolder(projectFile, assetsFolder);
-
 
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
@@ -70,6 +73,12 @@ public class NewProjectPage extends BorderPane {
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
                 );
                 assetLibraryFile.writeString(assetLibrary.jsonString(), false);
+
+                final Title initialTitle = Title.createNewTitle(assetLibrary, projTitle, titleImage.id, theme6.id);
+                final SystemData systemData = SystemData.createNewSystemData(initialTitle);
+
+                final FileHandle systemFile = projectFile.sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
+                systemFile.writeString(systemData.jsonString(), false);
 
                 ApplicationContext.context().openProject(projectFile);
             }

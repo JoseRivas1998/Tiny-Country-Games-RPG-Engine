@@ -19,6 +19,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.util.Comparator;
@@ -35,7 +36,7 @@ public class MusicTab extends Tab {
 
     private SoundAsset selectedMusicAsset;
 
-    public MusicTab(Stage owner) {
+    public MusicTab(Window owner) {
         super("Music");
         this.setClosable(false);
         this.remove = this.buildRemoveButton(owner);
@@ -64,7 +65,7 @@ public class MusicTab extends Tab {
 
     }
 
-    private Button buildPreviewButton(Stage owner) {
+    private Button buildPreviewButton(Window owner) {
         final Button preview = new Button("Preview");
         preview.setMaxWidth(Double.MAX_VALUE);
         preview.setDisable(true);
@@ -72,7 +73,7 @@ public class MusicTab extends Tab {
         return preview;
     }
 
-    private void playSelectedSong(Stage owner) {
+    private void playSelectedSong(Window owner) {
         try {
             final ApplicationContext context = ApplicationContext.context();
             final SoundAsset toPlay = Objects.requireNonNull(this.selectedMusicAsset);
@@ -86,14 +87,14 @@ public class MusicTab extends Tab {
         }
     }
 
-    private Button buildImportButton(Stage owner) {
+    private Button buildImportButton(Window owner) {
         final Button importButton = new Button("Import");
         importButton.setOnAction(event -> this.importMusic(owner));
         importButton.setMaxWidth(Double.MAX_VALUE);
         return importButton;
     }
 
-    private void importMusic(Stage owner) {
+    private void importMusic(Window owner) {
         final FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(ExtensionUtils.supportedSoundFiles());
         final Optional<File> selectedFileOptional = Optional.ofNullable(fileChooser.showOpenDialog(owner));
@@ -119,7 +120,7 @@ public class MusicTab extends Tab {
         this.preview.setDisable(disabled);
     }
 
-    private SoundAsset createSoundAsset(Stage owner, File selectedFile) {
+    private SoundAsset createSoundAsset(Window owner, File selectedFile) {
         final CurrentProject currentProject = ApplicationContext.context().currentProject;
         final FileHandle selectedFileHandle = this.validateSelectedFile(selectedFile);
         final FileHandle projectFile = currentProject.getProjectFileHandle();
@@ -132,7 +133,7 @@ public class MusicTab extends Tab {
         return SoundAsset.generateNewSoundAsset(musicTitle, musicPath, musicDuration);
     }
 
-    private String inputMusicTitle(FileHandle selectedFileHandle, Stage owner) {
+    private String inputMusicTitle(FileHandle selectedFileHandle, Window owner) {
         String musicTitle = null;
         do {
             final String initialName = selectedFileHandle.nameWithoutExtension();
@@ -168,7 +169,7 @@ public class MusicTab extends Tab {
         return selectedFileHandle;
     }
 
-    private Button buildRemoveButton(Stage owner) {
+    private Button buildRemoveButton(Window owner) {
         final Button remove = new Button("Remove");
         remove.setDisable(true);
         remove.setMaxWidth(Double.MAX_VALUE);
@@ -176,7 +177,7 @@ public class MusicTab extends Tab {
         return remove;
     }
 
-    private void removeSelectedMusic(Stage owner) {
+    private void removeSelectedMusic(Window owner) {
         final ApplicationContext context = ApplicationContext.context();
         try {
             context.jukebox.stopAll();
