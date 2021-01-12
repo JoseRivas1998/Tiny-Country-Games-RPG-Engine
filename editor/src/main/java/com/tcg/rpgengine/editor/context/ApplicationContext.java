@@ -1,22 +1,37 @@
 package com.tcg.rpgengine.editor.context;
 
 import com.badlogic.gdx.Files;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.tools.texturepacker.TexturePacker;
+import com.tcg.rpgengine.common.data.AssetLibrary;
+import com.tcg.rpgengine.common.data.assets.Asset;
+import com.tcg.rpgengine.editor.TestGameRunner;
 import com.tcg.rpgengine.editor.components.IconBar;
+import com.tcg.rpgengine.editor.concurrency.TaskSequence;
 import com.tcg.rpgengine.editor.containers.AssetManagerPage;
 import com.tcg.rpgengine.editor.containers.DatabaseManagerPage;
 import com.tcg.rpgengine.editor.containers.EditorPane;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
+import com.tcg.rpgengine.editor.utils.JavaProcess;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import javafx.stage.WindowEvent;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
 public class ApplicationContext {
 
@@ -28,7 +43,7 @@ public class ApplicationContext {
     public final Files files;
     public CurrentProject currentProject;
     public final AppData appData;
-    public final Jukebox jukebox;
+    public Jukebox jukebox;
 
     private ApplicationContext() {
         this.files = new LwjglFiles();
@@ -116,6 +131,78 @@ public class ApplicationContext {
         stage.initOwner(this.primaryStage);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.showAndWait();
+    }
+
+    public void playGame() {
+        final Stage progressStage = new Stage();
+
+        final TaskSequence taskSequence = new TaskSequence();
+        final AssetLibrary assetLibrary = this.currentProject.assetLibrary;
+        taskSequence.addTask("Compiling Music", () -> {
+            this.copyAssetCollectionToLocal(assetLibrary.getAllMusicAssets(), soundAsset -> soundAsset.path);
+            final FileHandle musicDataFile = this.files.local("data/music.tcgdat");
+            final byte[] dataBytes = this.currentProject.assetLibrary.musicAssetBytes();
+            musicDataFile.writeBytes(dataBytes, false);
+        });
+        taskSequence.addTask("Compiling Images", () -> {
+            this.copyAssetCollectionToLocal(assetLibrary.getAllImageAssets(), imageAsset -> imageAsset.path);
+            final FileHandle imageDataFile = this.files.local("data/images.tcgdat");
+            final byte[] dataBytes = this.currentProject.assetLibrary.imageAssetBytes();
+            imageDataFile.writeBytes(dataBytes, false);
+        });
+        taskSequence.addTask("Compiling System", () -> {
+            final FileHandle systemDataFile = this.files.local("data/system.tcgdat");
+            final byte[] dataBytes = this.currentProject.systemData.toBytes();
+            systemDataFile.writeBytes(dataBytes, false);
+        });
+        taskSequence.addTask("Running Game", () -> {
+            try {
+                JavaProcess.exec(TestGameRunner.class, null);
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    final ErrorDialog errorDialog = new ErrorDialog(e);
+                    errorDialog.initOwner(progressStage);
+                    errorDialog.showAndWait();
+                });
+            }
+        });
+        taskSequence.addTask("Cleaning Up", () -> {
+            final FileHandle assetsFolder = this.files.local("assets/");
+            final FileHandle dataFolder = this.files.local("data/");
+            assetsFolder.deleteDirectory();
+            dataFolder.deleteDirectory();
+        });
+
+        final ProgressBar progressBar = new ProgressBar();
+        progressBar.progressProperty().bind(taskSequence.progressProperty());
+        final Label messageLabel = new Label();
+        messageLabel.textProperty().bind(taskSequence.messageProperty());
+
+        final VBox vBox = new VBox(Constants.SPACING, progressBar, messageLabel);
+        vBox.setPadding(new Insets(Constants.PADDING));
+
+        progressStage.setScene(new Scene(vBox));
+        progressStage.initOwner(this.primaryStage);
+        progressStage.initModality(Modality.APPLICATION_MODAL);
+        progressStage.setResizable(false);
+        progressStage.setOnCloseRequest(Event::consume);
+        progressStage.setTitle("Running Game");
+        taskSequence.setOnScheduled(event -> progressStage.show());
+        taskSequence.setOnSucceeded(event -> {
+            progressStage.close();
+
+        });
+
+        taskSequence.start();
+    }
+
+    private <T extends Asset> void copyAssetCollectionToLocal(Collection<T> assets, Function<T, String> pathCreator) {
+        assets.forEach(asset -> {
+            final String path = pathCreator.apply(asset);
+            final FileHandle sourceFile = this.currentProject.getProjectFileHandle().sibling(path);
+            final FileHandle targetFile = this.files.local(path);
+            sourceFile.copyTo(targetFile);
+        });
     }
 
     private EventHandler<WindowEvent> defaultStageCloseEventListener() {

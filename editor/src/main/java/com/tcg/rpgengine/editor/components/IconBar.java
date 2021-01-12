@@ -12,9 +12,17 @@ public class IconBar extends MenuBar {
 
     public IconBar() {
         super();
+        final Menu play = new Menu();
+        final Button playButton = this.iconMenuButton(Icons.FA_PLAY);
+        playButton.setOnAction(event -> ApplicationContext.context().playGame());
+        playButton.setTooltip(new Tooltip("Run Game"));
+        play.setGraphic(playButton);
+        play.setStyle("-fx-background-color: transparent;");
+
         this.getMenus().addAll(
                 this.buildDatabaseManager(),
-                this.buildAssetManager()
+                this.buildAssetManager(),
+                play
         );
 
     }

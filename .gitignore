@@ -114,3 +114,7 @@ Thumbs.db
 /ios/xcode/native/
 /ios/IOSLauncher.app
 /ios/IOSLauncher.app.dSYM
+
+core/assets/data
+core/assets/assets
+core/assets/img

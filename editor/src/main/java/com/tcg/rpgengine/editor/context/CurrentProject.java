@@ -52,11 +52,11 @@ public class CurrentProject {
     }
 
     public void saveAssetLibrary() {
-        this.getAssetLibFileHandle().writeString(this.assetLibrary.jsonString(), false);
+        this.getAssetLibFileHandle().writeString(this.assetLibrary.jsonString(4), false);
     }
 
     public void saveSystemData() {
-        this.getSystemDataFileHandle().writeString(this.systemData.jsonString(), false);
+        this.getSystemDataFileHandle().writeString(this.systemData.jsonString(4), false);
     }
 
     static Optional<CurrentProject> selectAndOpenProject() {

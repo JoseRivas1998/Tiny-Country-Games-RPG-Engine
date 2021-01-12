@@ -72,13 +72,13 @@ public class NewProjectPage extends BorderPane {
                 final FileHandle assetLibraryFile = projectFile.sibling(
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
                 );
-                assetLibraryFile.writeString(assetLibrary.jsonString(), false);
+                assetLibraryFile.writeString(assetLibrary.jsonString(4), false);
 
                 final Title initialTitle = Title.createNewTitle(assetLibrary, projTitle, titleImage.id, theme6.id);
                 final SystemData systemData = SystemData.createNewSystemData(initialTitle);
 
                 final FileHandle systemFile = projectFile.sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
-                systemFile.writeString(systemData.jsonString(), false);
+                systemFile.writeString(systemData.jsonString(4), false);
 
                 ApplicationContext.context().openProject(projectFile);
             }
@@ -115,7 +115,7 @@ public class NewProjectPage extends BorderPane {
         final FileHandle projectFile = destination.child(projectFileName);
         this.deleteProjectFileIfExists(projectFile);
         final Project project = Project.generateNewProject(title);
-        projectFile.writeString(project.toString(), false, "UTF-8");
+        projectFile.writeString(project.jsonString(4), false, "UTF-8");
         return projectFile;
     }
 
