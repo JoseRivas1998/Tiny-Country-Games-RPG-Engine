@@ -1,16 +1,18 @@
 package com.tcg.rpgengine.common.data.system;
 
 import com.tcg.rpgengine.common.data.AssetLibrary;
+import com.tcg.rpgengine.common.data.BinaryDocument;
 import com.tcg.rpgengine.common.data.JSONDocument;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Title implements JSONDocument {
+public class Title implements JSONDocument, BinaryDocument {
 
     private static final String JSON_TITLE_FIELD = "title";
     private static final String JSON_IMAGE_FIELD = "image";
@@ -41,6 +43,13 @@ public class Title implements JSONDocument {
         final String title = jsonObject.getString(JSON_TITLE_FIELD);
         final UUID imageId = UuidUtils.fromString(jsonObject.getString(JSON_IMAGE_FIELD));
         final UUID musicId = UuidUtils.fromString(jsonObject.getString(JSON_MUSIC_FIELD));
+        return new Title(assetLibrary, title, imageId, musicId);
+    }
+
+    public static Title createFromBytes(AssetLibrary assetLibrary, ByteBuffer bytes) {
+        final String title = BinaryDocument.getUTF8String(bytes);
+        final UUID imageId = BinaryDocument.getUuid(bytes);
+        final UUID musicId = BinaryDocument.getUuid(bytes);
         return new Title(assetLibrary, title, imageId, musicId);
     }
 
@@ -81,5 +90,19 @@ public class Title implements JSONDocument {
         jsonObject.put(JSON_IMAGE_FIELD, this.imageId.toString());
         jsonObject.put(JSON_MUSIC_FIELD, this.musicId.toString());
         return jsonObject;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[this.numberOfBytes()]);
+        BinaryDocument.putUTF8String(byteBuffer, this.title);
+        byteBuffer.put(UuidUtils.toBytes(this.imageId));
+        byteBuffer.put(UuidUtils.toBytes(this.musicId));
+        return byteBuffer.array();
+    }
+
+    @Override
+    public int numberOfBytes() {
+        return Integer.BYTES + this.title.length() + UuidUtils.UUID_NUMBER_OF_BYTES + UuidUtils.UUID_NUMBER_OF_BYTES;
     }
 }

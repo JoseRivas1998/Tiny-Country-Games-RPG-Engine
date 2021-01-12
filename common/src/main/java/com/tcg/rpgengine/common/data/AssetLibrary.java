@@ -6,6 +6,7 @@ import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,6 +70,10 @@ public class AssetLibrary implements JSONDocument {
         this.music.remove(soundAsset.id);
     }
 
+    public byte[] musicAssetBytes() {
+        return encodeAssetCollection(this.music.values());
+    }
+
     public ImageAsset getImageAssetById(UUID imageId) {
         return getNonNullAsset(imageId, this.images);
     }
@@ -84,6 +89,10 @@ public class AssetLibrary implements JSONDocument {
     public void deleteImageAsset(ImageAsset asset) {
         this.verifyReferenceCount(asset);
         this.images.remove(asset.id);
+    }
+
+    public byte[] imageAssetBytes() {
+        return encodeAssetCollection(this.images.values());
     }
 
     private void verifyReferenceCount(Asset asset) {
@@ -106,6 +115,17 @@ public class AssetLibrary implements JSONDocument {
 
     private static <T extends Asset> T getNonNullAsset(UUID assetId, Map<UUID, T> assetMap) {
         return Objects.requireNonNull(assetMap.get(Objects.requireNonNull(assetId)));
+    }
+
+    public static <T extends Asset> byte[] encodeAssetCollection(Collection<T> assets) {
+        final int totalBytes = assets.stream()
+                .mapToInt(Asset::numberOfBytes)
+                .sum();
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[totalBytes]);
+        assets.stream()
+                .map(Asset::toBytes)
+                .forEach(byteBuffer::put);
+        return byteBuffer.array();
     }
 
     @Override
