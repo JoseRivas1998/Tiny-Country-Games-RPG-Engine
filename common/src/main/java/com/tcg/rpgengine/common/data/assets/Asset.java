@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public abstract class Asset implements JSONDocument, BinaryDocument {
 
-    public final static int HEADER_NUMBER_OF_BYTES = UuidUtils.UUID_NUMBER_OF_BYTES + Integer.BYTES;
+    public final static int HEADER_NUMBER_OF_BYTES = UuidUtils.UUID_NUMBER_OF_BYTES;
 
     protected static final String JSON_ID_FIELD = "id";
     public final UUID id;
@@ -34,11 +34,14 @@ public abstract class Asset implements JSONDocument, BinaryDocument {
     }
 
     @Override
+    public int numberOfBytes() {
+        return Asset.HEADER_NUMBER_OF_BYTES + this.contentLength();
+    }
+
+    @Override
     public byte[] toBytes() {
-        final ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[Asset.HEADER_NUMBER_OF_BYTES + this.contentLength()]);
+        final ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[this.numberOfBytes()]);
         byteBuffer.put(UuidUtils.toBytes(this.id));
-        byteBuffer.position(UuidUtils.UUID_NUMBER_OF_BYTES);
-        byteBuffer.putInt(this.contentLength());
         this.encodeContent(byteBuffer);
         return byteBuffer.array();
     }

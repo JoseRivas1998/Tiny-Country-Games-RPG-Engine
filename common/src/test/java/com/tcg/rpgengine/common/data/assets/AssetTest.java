@@ -179,7 +179,7 @@ public class AssetTest {
 
     @Test
     public void verifyHeaderLength() {
-        assertEquals(20, Asset.HEADER_NUMBER_OF_BYTES);
+        assertEquals(16, Asset.HEADER_NUMBER_OF_BYTES);
     }
 
     @Test
@@ -187,12 +187,14 @@ public class AssetTest {
         final Asset noContentAsset = this.createMockedAssetFromUUID(UUID.randomUUID());
         Mockito.when(noContentAsset.contentLength()).thenReturn(0);
         Mockito.when(noContentAsset.toBytes()).thenCallRealMethod();
+        Mockito.when(noContentAsset.numberOfBytes()).thenCallRealMethod();
         final byte[] noContentBytes = noContentAsset.toBytes();
         assertEquals(Asset.HEADER_NUMBER_OF_BYTES, noContentBytes.length);
 
         final Asset tenBytesAsset = this.createMockedAssetFromUUID(UUID.randomUUID());
         Mockito.when(tenBytesAsset.contentLength()).thenReturn(10);
         Mockito.when(tenBytesAsset.toBytes()).thenCallRealMethod();
+        Mockito.when(tenBytesAsset.numberOfBytes()).thenCallRealMethod();
         final byte[] tenBytesAssets = tenBytesAsset.toBytes();
         assertEquals(Asset.HEADER_NUMBER_OF_BYTES + 10, tenBytesAssets.length);
     }
@@ -203,15 +205,14 @@ public class AssetTest {
         final Asset asset = this.createMockedAssetFromUUID(assetId);
         Mockito.when(asset.contentLength()).thenReturn(0);
         Mockito.when(asset.toBytes()).thenCallRealMethod();
+        Mockito.when(asset.numberOfBytes()).thenCallRealMethod();
         byte[] expected = {
                 // UUID
                 0x49, (byte) 0xa0, (byte) 0xd0, (byte) 0x9a,
                 0x7b, 0x20,
                 0x43, 0x50,
                 (byte) 0xbe, (byte) 0xb0,
-                0x5a, 0x69, 0x45, 0x15, (byte) 0xd7, 0x7a,
-                // Content Length
-                0x00, 0x00, 0x00, 0x00
+                0x5a, 0x69, 0x45, 0x15, (byte) 0xd7, 0x7a
         };
         final byte[] actual = asset.toBytes();
         assertArrayEquals(expected, actual);
@@ -223,6 +224,7 @@ public class AssetTest {
         final Asset asset = this.createMockedAssetFromUUID(assetId);
         Mockito.when(asset.contentLength()).thenReturn(3);
         Mockito.when(asset.toBytes()).thenCallRealMethod();
+        Mockito.when(asset.numberOfBytes()).thenCallRealMethod();
         byte[] expected = {
                 // UUID
                 0x49, (byte) 0xa0, (byte) 0xd0, (byte) 0x9a,
@@ -230,8 +232,6 @@ public class AssetTest {
                 0x43, 0x50,
                 (byte) 0xbe, (byte) 0xb0,
                 0x5a, 0x69, 0x45, 0x15, (byte) 0xd7, 0x7a,
-                // Content Length
-                0x00, 0x00, 0x00, 0x03,
                 // Content bytes
                 0x00, 0x00, 0x00
         };

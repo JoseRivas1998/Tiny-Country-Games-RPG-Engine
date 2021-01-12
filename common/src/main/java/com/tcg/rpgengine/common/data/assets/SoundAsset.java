@@ -4,6 +4,7 @@ import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,6 +38,25 @@ public final class SoundAsset extends Asset {
         return new SoundAsset(id, title, path, duration);
     }
 
+    public static SoundAsset createFromBytes(ByteBuffer bytes) {
+        final byte[] idBytes = new byte[UuidUtils.UUID_NUMBER_OF_BYTES];
+        bytes.get(idBytes);
+        final UUID id = UuidUtils.fromBytes(idBytes);
+
+        final int titleLength = bytes.getInt();
+        final byte[] titleBytes = new byte[titleLength];
+        bytes.get(titleBytes);
+        final String title = new String(titleBytes, StandardCharsets.UTF_8);
+
+        final int pathLength = bytes.getInt();
+        final byte[] pathBytes = new byte[pathLength];
+        bytes.get(pathBytes);
+        final String path = new String(pathBytes, StandardCharsets.UTF_8);
+
+        final float duration = bytes.getFloat();
+        return new SoundAsset(id, title, path, duration);
+    }
+
     @Override
     protected void addAdditionalJSONData(JSONObject jsonObject) {
         jsonObject.put(JSON_TITLE_FIELD, this.title);
@@ -46,12 +66,20 @@ public final class SoundAsset extends Asset {
 
     @Override
     protected int contentLength() {
-        return 0;
+        return Integer.BYTES + this.title.length() + Integer.BYTES + this.path.length() + Float.BYTES;
     }
 
     @Override
     protected void encodeContent(ByteBuffer byteBuffer) {
+        this.putString(byteBuffer, this.title);
+        this.putString(byteBuffer, this.path);
+        byteBuffer.putFloat(this.duration);
+    }
 
+    private void putString(ByteBuffer byteBuffer, String string) {
+        final byte[] stringBytes = string.getBytes(StandardCharsets.UTF_8);
+        byteBuffer.putInt(stringBytes.length);
+        byteBuffer.put(stringBytes);
     }
 
     @Override
