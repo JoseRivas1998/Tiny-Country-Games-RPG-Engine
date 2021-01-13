@@ -1,10 +1,7 @@
-package com.tcg.rpgengine.screens;
+package com.tcg.rpgengine.gamestates;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Interpolation;
@@ -20,7 +17,7 @@ import com.tcg.rpgengine.utils.GameDataLoader;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class LoadingScreen extends ScreenAdapter {
+public class LoadingState implements GameState {
 
     private static final float FADE_TIME = 1.0f;
     private static final float HOLD_TIME = 2.0f;
@@ -35,13 +32,13 @@ public class LoadingScreen extends ScreenAdapter {
     private float currentStateTime;
     private LoadingStates currentState;
 
-    public LoadingScreen(TCGRPGGame game) {
+    public LoadingState(TCGRPGGame game) {
         this.game = game;
         this.decodingAssetData = new AtomicBoolean(true);
     }
 
     @Override
-    public void show() {
+    public void create() {
 
         this.viewport = new FitViewport(GameConstants.VIEW_WIDTH, GameConstants.VIEW_HEIGHT);
 
@@ -70,7 +67,12 @@ public class LoadingScreen extends ScreenAdapter {
     }
 
     @Override
-    public void render(float delta) {
+    public void handleInput(float deltaTime) {
+
+    }
+
+    @Override
+    public void update(float delta) {
         if (!this.game.localAssetManager.isFinished()) {
             this.game.localAssetManager.update();
         }
@@ -89,15 +91,22 @@ public class LoadingScreen extends ScreenAdapter {
 
     }
 
+    @Override
+    public void draw(float delta) {
+        this.game.batch.begin();
+        this.game.batch.setProjectionMatrix(this.viewport.getCamera().combined);
+        this.game.batch.draw(this.splashImage, this.splashImageRect.x, this.splashImageRect.y);
+        this.game.batch.end();
+    }
+
     private void renderFadeOut(float delta) {
         final float fadeOutAlpha = FADE_FUNCTION.apply(1f, 0f, this.currentStateTime / FADE_TIME);
         this.game.batch.setColor(1f, 1f, 1f, fadeOutAlpha);
         if (Float.compare(this.currentStateTime, FADE_TIME) >= 0) {
             this.game.batch.setColor(Color.WHITE);
-            this.game.setScreen(new TitleScreen(this.game));
+            this.game.stateEngine.setState(new TitleState(this.game));
         } else {
             this.currentStateTime += delta;
-            this.draw();
         }
     }
 
@@ -109,7 +118,6 @@ public class LoadingScreen extends ScreenAdapter {
         } else {
             this.currentStateTime += delta;
         }
-        this.draw();
     }
 
     private void renderFadeIn(float delta) {
@@ -122,14 +130,6 @@ public class LoadingScreen extends ScreenAdapter {
         } else {
             this.currentStateTime += delta;
         }
-        this.draw();
-    }
-
-    private void draw() {
-        this.game.batch.begin();
-        this.game.batch.setProjectionMatrix(this.viewport.getCamera().combined);
-        this.game.batch.draw(this.splashImage, this.splashImageRect.x, this.splashImageRect.y);
-        this.game.batch.end();
     }
 
     private boolean isDoneLoading() {
@@ -139,6 +139,21 @@ public class LoadingScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         this.viewport.update(width, height, true);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
     private enum LoadingStates {

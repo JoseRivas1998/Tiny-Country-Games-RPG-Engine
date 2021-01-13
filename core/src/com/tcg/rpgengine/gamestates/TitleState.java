@@ -1,10 +1,7 @@
-package com.tcg.rpgengine.screens;
+package com.tcg.rpgengine.gamestates;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -12,21 +9,22 @@ import com.tcg.rpgengine.TCGRPGGame;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.system.Title;
+import com.tcg.rpgengine.gamestates.GameState;
 import com.tcg.rpgengine.utils.GameConstants;
 
-public class TitleScreen extends ScreenAdapter {
+public class TitleState implements GameState {
 
     private final TCGRPGGame game;
     private Texture backgroundImage;
     private Viewport viewport;
     private Music titleMusic;
 
-    public TitleScreen(TCGRPGGame game) {
+    public TitleState(TCGRPGGame game) {
         this.game = game;
     }
 
     @Override
-    public void show() {
+    public void create() {
         this.viewport = new FitViewport(GameConstants.VIEW_WIDTH, GameConstants.VIEW_HEIGHT);
 
         final Title titleData = this.game.systemData.title;
@@ -41,13 +39,21 @@ public class TitleScreen extends ScreenAdapter {
     }
 
     @Override
-    public void render(float delta) {
+    public void handleInput(float deltaTime) {
+
+    }
+
+    @Override
+    public void update(float deltaTime) {
+
+    }
+
+    @Override
+    public void draw(float delta) {
 
         this.game.batch.begin();
         this.game.batch.setProjectionMatrix(this.viewport.getCamera().combined);
-
         this.game.batch.draw(this.backgroundImage, 0, 0, GameConstants.VIEW_WIDTH, GameConstants.VIEW_HEIGHT);
-
         this.game.batch.end();
 
     }
@@ -58,7 +64,17 @@ public class TitleScreen extends ScreenAdapter {
     }
 
     @Override
-    public void hide() {
+    public void pause() {
+        this.titleMusic.pause();
+    }
+
+    @Override
+    public void resume() {
+        this.titleMusic.play();
+    }
+
+    @Override
+    public void dispose() {
         this.titleMusic.stop();
     }
 }
