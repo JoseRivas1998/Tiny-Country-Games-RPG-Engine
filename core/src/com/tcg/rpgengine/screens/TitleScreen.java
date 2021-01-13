@@ -3,12 +3,14 @@ package com.tcg.rpgengine.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.assets.AssetDescriptor;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tcg.rpgengine.TCGRPGGame;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
+import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.system.Title;
 import com.tcg.rpgengine.utils.GameConstants;
 
@@ -17,6 +19,7 @@ public class TitleScreen extends ScreenAdapter {
     private final TCGRPGGame game;
     private Texture backgroundImage;
     private Viewport viewport;
+    private Music titleMusic;
 
     public TitleScreen(TCGRPGGame game) {
         this.game = game;
@@ -29,6 +32,12 @@ public class TitleScreen extends ScreenAdapter {
         final Title titleData = this.game.systemData.title;
         final ImageAsset titleImageAsset = this.game.assetLibrary.getImageAssetById(titleData.getImageId());
         this.backgroundImage = this.game.localAssetManager.get(titleImageAsset.path, Texture.class);
+        final SoundAsset titleMusicAsset = this.game.assetLibrary.getMusicAssetById(titleData.getMusicId());
+        this.titleMusic = this.game.localAssetManager.get(titleMusicAsset.path, Music.class);
+        this.titleMusic.setLooping(true);
+        Gdx.graphics.setTitle(titleData.title);
+
+        this.titleMusic.play();
     }
 
     @Override
@@ -46,5 +55,10 @@ public class TitleScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         this.viewport.update(width, height, true);
+    }
+
+    @Override
+    public void hide() {
+        this.titleMusic.stop();
     }
 }
