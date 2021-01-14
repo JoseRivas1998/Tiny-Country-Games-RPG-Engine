@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.Asset;
+import com.tcg.rpgengine.common.utils.DataCompression;
 import com.tcg.rpgengine.editor.TestGameRunner;
 import com.tcg.rpgengine.editor.components.IconBar;
 import com.tcg.rpgengine.editor.concurrency.TaskSequence;
@@ -141,19 +142,19 @@ public class ApplicationContext {
         taskSequence.addTask("Compiling Music", () -> {
             this.copyAssetCollectionToLocal(assetLibrary.getAllMusicAssets(), soundAsset -> soundAsset.path);
             final FileHandle musicDataFile = this.files.local("data/music.tcgdat");
-            final byte[] dataBytes = this.currentProject.assetLibrary.musicAssetBytes();
-            musicDataFile.writeBytes(dataBytes, false);
+            final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.musicAssetBytes());
+            musicDataFile.writeBytes(compressedBytes, false);
         });
         taskSequence.addTask("Compiling Images", () -> {
             this.copyAssetCollectionToLocal(assetLibrary.getAllImageAssets(), imageAsset -> imageAsset.path);
             final FileHandle imageDataFile = this.files.local("data/images.tcgdat");
-            final byte[] dataBytes = this.currentProject.assetLibrary.imageAssetBytes();
-            imageDataFile.writeBytes(dataBytes, false);
+            final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.imageAssetBytes());
+            imageDataFile.writeBytes(compressedBytes, false);
         });
         taskSequence.addTask("Compiling System", () -> {
             final FileHandle systemDataFile = this.files.local("data/system.tcgdat");
-            final byte[] dataBytes = this.currentProject.systemData.toBytes();
-            systemDataFile.writeBytes(dataBytes, false);
+            final byte[] compressedBytes = DataCompression.compress(this.currentProject.systemData.toBytes());
+            systemDataFile.writeBytes(compressedBytes, false);
         });
         taskSequence.addTask("Running Game", () -> {
             try {
