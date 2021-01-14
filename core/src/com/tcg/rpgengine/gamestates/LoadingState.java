@@ -4,6 +4,8 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -52,6 +54,9 @@ public class LoadingState implements GameState {
         this.splashImageRect.x = GameConstants.VIEW_WIDTH * 0.5f - this.splashImageRect.width * 0.5f;
         this.splashImageRect.y = GameConstants.VIEW_HEIGHT * 0.5f - this.splashImageRect.height * 0.5f;
 
+        this.loadGothicFont("gothic24.ttf", 24, 2);
+        this.loadGothicFont("gothic72.ttf", 72, 3);
+
         final GameDataLoader gameDataLoader = new GameDataLoader(this.game, () -> {
             final Title title = this.game.systemData.title;
             final ImageAsset titleImage = this.game.assetLibrary.getImageAssetById(title.getImageId());
@@ -66,6 +71,16 @@ public class LoadingState implements GameState {
         this.currentState = LoadingStates.FadeIn;
     }
 
+    protected void loadGothicFont(String fontName, int fontSize, float borderWidth) {
+        final FreeTypeFontLoaderParameter gothic = new FreeTypeFontLoaderParameter();
+        gothic.fontFileName = "font/gothic_regular.ttf";
+        gothic.fontParameters.size = fontSize;
+        gothic.fontParameters.color = Color.WHITE;
+        gothic.fontParameters.borderWidth = borderWidth;
+        gothic.fontParameters.borderColor = Color.BLACK;
+        this.game.internalAssetManager.load(fontName, BitmapFont.class, gothic);
+    }
+
     @Override
     public void handleInput(float deltaTime) {
 
@@ -75,6 +90,9 @@ public class LoadingState implements GameState {
     public void update(float delta) {
         if (!this.game.localAssetManager.isFinished()) {
             this.game.localAssetManager.update();
+        }
+        if (!this.game.internalAssetManager.isFinished()) {
+            this.game.internalAssetManager.update();
         }
 
         switch (this.currentState) {
@@ -133,7 +151,9 @@ public class LoadingState implements GameState {
     }
 
     private boolean isDoneLoading() {
-        return !this.decodingAssetData.get() && this.game.localAssetManager.isFinished();
+        return !this.decodingAssetData.get()
+                && this.game.localAssetManager.isFinished()
+                && this.game.internalAssetManager.isFinished();
     }
 
     @Override

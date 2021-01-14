@@ -3,9 +3,14 @@ package com.tcg.rpgengine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.LocalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.game.GameStateEngine;
@@ -28,11 +33,22 @@ public class TCGRPGGame extends ApplicationAdapter {
 	public void create () {
 		Gdx.app.setLogLevel(this.logLevel);
 		this.batch = new SpriteBatch();
+
 		this.localAssetManager = new AssetManager(new LocalFileHandleResolver());
+
 		this.internalAssetManager = new AssetManager();
+		this.initializeInternalFreetypeFontLoader();
+
 		this.assetLibrary = AssetLibrary.newAssetLibrary();
 		this.stateEngine = new GameStateEngine();
 		this.stateEngine.setState(new LoadingState(this));
+	}
+
+	private void initializeInternalFreetypeFontLoader() {
+		final InternalFileHandleResolver internalResolver = new InternalFileHandleResolver();
+		final FreeTypeFontGeneratorLoader internalFontLoader = new FreeTypeFontGeneratorLoader(internalResolver);
+		this.internalAssetManager.setLoader(FreeTypeFontGenerator.class, internalFontLoader);
+		this.internalAssetManager.setLoader(BitmapFont.class, ".ttf", new FreetypeFontLoader(internalResolver));
 	}
 
 	@Override
