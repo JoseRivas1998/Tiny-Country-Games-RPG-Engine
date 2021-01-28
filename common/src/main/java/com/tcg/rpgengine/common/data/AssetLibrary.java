@@ -14,14 +14,17 @@ public class AssetLibrary implements JSONDocument {
 
     private static final String JSON_MUSIC_FIELD = "music";
     private static final String JSON_IMAGES_FIELD = "images";
+    private static final String JSON_SOUND_FIELD = "sound";
     private final Map<UUID, SoundAsset> music;
     private final Map<UUID, ImageAsset> images;
+    private final Map<UUID, SoundAsset> soundEffects;
 
     private final Map<UUID, Integer> assetReferenceCount;
 
     private AssetLibrary() {
         this.music = new HashMap<>();
         this.images = new HashMap<>();
+        this.soundEffects = new HashMap<>();
         this.assetReferenceCount = new HashMap<>();
     }
 
@@ -33,6 +36,7 @@ public class AssetLibrary implements JSONDocument {
         final JSONObject jsonObject = new JSONObject(Objects.requireNonNull(jsonString));
         final JSONArray music = jsonObject.getJSONArray(JSON_MUSIC_FIELD);
         final JSONArray images = jsonObject.getJSONArray(JSON_IMAGES_FIELD);
+        final JSONArray sound = jsonObject.getJSONArray(JSON_SOUND_FIELD);
         final AssetLibrary assetLibrary = new AssetLibrary();
         for (int i = 0; i < music.length(); i++) {
             final SoundAsset soundAsset = SoundAsset.createFromJSON(music.getJSONObject(i).toString());
@@ -41,6 +45,10 @@ public class AssetLibrary implements JSONDocument {
         for (int i = 0; i < images.length(); i++) {
             final ImageAsset imageAsset = ImageAsset.createFromJSON(images.getJSONObject(i).toString());
             assetLibrary.images.put(imageAsset.id, imageAsset);
+        }
+        for (int i = 0; i < sound.length(); i++) {
+            final SoundAsset soundAsset = SoundAsset.createFromJSON(sound.getJSONObject(i).toString());
+            assetLibrary.soundEffects.put(soundAsset.id, soundAsset);
         }
         return assetLibrary;
     }
@@ -95,6 +103,35 @@ public class AssetLibrary implements JSONDocument {
         return encodeAssetCollection(this.images.values());
     }
 
+    public SoundAsset getSoundEffectAssetBytId(UUID soundEffectId) {
+        return getNonNullAsset(soundEffectId, this.soundEffects);
+    }
+
+    public List<SoundAsset> getAllSoundEffectAssets() {
+        return new ArrayList<>(this.soundEffects.values());
+    }
+
+    public List<SoundAsset> getAllSoundAssetsSorted(Comparator<SoundAsset> soundAssetComparator) {
+        return this.soundEffects.values()
+                .stream()
+                .sorted(soundAssetComparator)
+                .collect(Collectors.toList());
+    }
+
+    public void addSoundEffectAsset(SoundAsset soundAsset) {
+        Objects.requireNonNull(soundAsset);
+        this.soundEffects.put(soundAsset.id, soundAsset);
+    }
+
+    public void deleteSoundEffectAsset(SoundAsset soundAsset) {
+        this.verifyReferenceCount(soundAsset);
+        this.soundEffects.remove(soundAsset.id);
+    }
+
+    public byte[] soundAssetBytes() {
+        return encodeAssetCollection(this.soundEffects.values());
+    }
+
     private void verifyReferenceCount(Asset asset) {
         if (this.getReferenceCount(asset) > 0) {
             throw new IllegalStateException("This asset is referenced once or more. It cannot be deleted.");
@@ -133,8 +170,8 @@ public class AssetLibrary implements JSONDocument {
         final JSONObject jsonObject = new JSONObject();
 
         jsonObject.put(JSON_MUSIC_FIELD, this.assetCollectionToJSONArray(this.music.values()));
-
         jsonObject.put(JSON_IMAGES_FIELD, this.assetCollectionToJSONArray(this.images.values()));
+        jsonObject.put(JSON_SOUND_FIELD, this.assetCollectionToJSONArray(this.soundEffects.values()));
 
         return jsonObject;
     }

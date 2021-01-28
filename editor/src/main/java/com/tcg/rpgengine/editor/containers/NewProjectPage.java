@@ -7,6 +7,7 @@ import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.common.data.system.Title;
+import com.tcg.rpgengine.common.data.system.UISounds;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.utils.AssetUtils;
@@ -65,9 +66,24 @@ public class NewProjectPage extends BorderPane {
                 final SoundAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
                 final ImageAsset titleImage = this.copyTitleImageIntoProjectFolder(projectFile, assetsFolder);
 
+                final SoundAsset cursor2 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/cursor2.mp3", "Cursor 2");
+                final SoundAsset decision1 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/decision1.mp3", "Decision 1");
+                final SoundAsset cancel1 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/cancel2.mp3", "Cancel 2");
+                final SoundAsset buzzer1 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/buzzer1.mp3", "Buzzer 1");
+
+
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
                 assetLibrary.addImageAsset(titleImage);
+
+                assetLibrary.addSoundEffectAsset(cursor2);
+                assetLibrary.addSoundEffectAsset(decision1);
+                assetLibrary.addSoundEffectAsset(cancel1);
+                assetLibrary.addSoundEffectAsset(buzzer1);
 
                 final FileHandle assetLibraryFile = projectFile.sibling(
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
@@ -75,7 +91,9 @@ public class NewProjectPage extends BorderPane {
                 assetLibraryFile.writeString(assetLibrary.jsonString(4), false);
 
                 final Title initialTitle = Title.createNewTitle(assetLibrary, projTitle, titleImage.id, theme6.id);
-                final SystemData systemData = SystemData.createNewSystemData(initialTitle);
+                final UISounds initialUiSounds = UISounds.createNewUISounds(assetLibrary, cursor2.id, decision1.id,
+                        cancel1.id, buzzer1.id);
+                final SystemData systemData = SystemData.createNewSystemData(initialTitle, initialUiSounds);
 
                 final FileHandle systemFile = projectFile.sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
                 systemFile.writeString(systemData.jsonString(4), false);
@@ -87,6 +105,17 @@ public class NewProjectPage extends BorderPane {
             errorDialog.initOwner(context.primaryStage);
             errorDialog.showAndWait();
         }
+    }
+
+    private SoundAsset copyAudioToProjectFolder(FileHandle projectFile, FileHandle assetsFolder, String internalPath,
+                                                String title) {
+        final ApplicationContext context = ApplicationContext.context();
+        final FileHandle internalFile = context.files.internal(internalPath);
+        final FileHandle assetFile = assetsFolder.child(internalFile.name());
+        internalFile.copyTo(assetFile);
+        final String assetPath = assetFile.path().substring(projectFile.parent().path().length() + 1);
+        final float assetDuration = AssetUtils.audioFileLength(assetFile);
+        return SoundAsset.generateNewSoundAsset(title, assetPath, assetDuration);
     }
 
     private ImageAsset copyTitleImageIntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder) {

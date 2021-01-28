@@ -16,7 +16,7 @@ public interface AssetUtils {
     static float audioFileLength(FileHandle audioFile) {
         try {
             final Mp3File mp3File = new Mp3File(audioFile.file());
-            return mp3File.getLengthInMilliseconds() / 1000f;
+            return Math.max(mp3File.getLengthInMilliseconds() / 1000f, 0); // length will be zero if things dont work
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             throw new RuntimeException(e);
         }
