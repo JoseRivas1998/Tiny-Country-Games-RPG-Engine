@@ -68,13 +68,13 @@ public class SoundTab extends Tab {
 
     private Button buildPreviewButton(Window owner) {
         final Button preview = new Button("Preview");
-        preview.setOnAction(event -> this.playSelectedSounAsset(owner));
+        preview.setOnAction(event -> this.playSelectedSoundAsset(owner));
         preview.setMaxWidth(Double.MAX_VALUE);
         preview.disableProperty().bind(this.soundAssetListView.getSelectionModel().selectedItemProperty().isNull());
         return preview;
     }
 
-    private void playSelectedSounAsset(Window owner) {
+    private void playSelectedSoundAsset(Window owner) {
         this.getSelectedAsset().ifPresent(selectedAsset -> this.playSoundAsset(owner, selectedAsset));
     }
 
