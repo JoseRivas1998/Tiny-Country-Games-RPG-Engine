@@ -22,4 +22,23 @@ public interface AssetUtils {
         }
     }
 
+    static FileHandle getFileAsNonExistent(FileHandle fileHandle) {
+        if (!fileHandle.exists()) {
+            return fileHandle;
+        }
+        final String baseName = fileHandle.nameWithoutExtension();
+        final String extension = fileHandle.extension();
+        int fileNameEnumerator = 1;
+        FileHandle result = fileHandle;
+        while (result.exists()) {
+            result = result.sibling(String.format("%s_%d.%s", baseName, fileNameEnumerator, extension));
+            fileNameEnumerator++;
+        }
+        return result;
+    }
+
+    static String getFilePathRelativeTo(FileHandle file, FileHandle relativeTo) {
+        return relativeTo.file().toPath().relativize(file.file().toPath()).toString().replace("\\", "/");
+    }
+
 }

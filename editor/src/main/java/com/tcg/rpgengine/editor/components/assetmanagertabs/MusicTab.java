@@ -127,8 +127,8 @@ public class MusicTab extends Tab {
         final String musicTitle = this.inputMusicTitle(selectedFileHandle, owner);
         final float musicDuration = AssetUtils.audioFileLength(selectedFileHandle);
         final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
-        final FileHandle assetFile = assetsFolder.child(selectedFileHandle.name());
-        final String musicPath = assetFile.path().substring(projectFile.parent().path().length() + 1);
+        final FileHandle assetFile = AssetUtils.getFileAsNonExistent(assetsFolder.child(selectedFileHandle.name()));
+        final String musicPath = AssetUtils.getFilePathRelativeTo(assetFile, projectFile.parent());
         selectedFileHandle.copyTo(assetFile);
         return SoundAsset.generateNewSoundAsset(musicTitle, musicPath, musicDuration);
     }

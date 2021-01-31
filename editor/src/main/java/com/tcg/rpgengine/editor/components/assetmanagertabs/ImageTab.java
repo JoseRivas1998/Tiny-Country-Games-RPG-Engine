@@ -7,6 +7,7 @@ import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.context.CurrentProject;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.dialogs.ImagePreviewDialog;
+import com.tcg.rpgengine.editor.utils.AssetUtils;
 import com.tcg.rpgengine.editor.utils.ExtensionUtils;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -148,8 +149,8 @@ public class ImageTab extends Tab {
         final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
         final String assetFileName = selectedFileHandle.name()
                 .trim().toLowerCase().replaceAll("\\s", "_");
-        final FileHandle assetFile = assetsFolder.child(assetFileName);
-        final String imagePath = assetFile.path().substring(projectFile.parent().path().length() + 1);
+        final FileHandle assetFile = AssetUtils.getFileAsNonExistent(assetsFolder.child(assetFileName));
+        final String imagePath = AssetUtils.getFilePathRelativeTo(assetFile, projectFile.parent());
         selectedFileHandle.copyTo(assetFile);
         return ImageAsset.generateNewImageAsset(imagePath);
     }
