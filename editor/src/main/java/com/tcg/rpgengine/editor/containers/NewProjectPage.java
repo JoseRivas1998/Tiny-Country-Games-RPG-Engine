@@ -67,13 +67,13 @@ public class NewProjectPage extends BorderPane {
                 final ImageAsset titleImage = this.copyTitleImageIntoProjectFolder(projectFile, assetsFolder);
 
                 final SoundAsset cursor2 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
-                        "initial_assets/cursor2.mp3", "Cursor 2");
+                        "initial_assets/cursor2.mp3");
                 final SoundAsset decision1 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
-                        "initial_assets/decision1.mp3", "Decision 1");
+                        "initial_assets/decision1.mp3");
                 final SoundAsset cancel1 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
-                        "initial_assets/cancel2.mp3", "Cancel 2");
+                        "initial_assets/cancel2.mp3");
                 final SoundAsset buzzer1 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
-                        "initial_assets/buzzer1.mp3", "Buzzer 1");
+                        "initial_assets/buzzer1.mp3");
 
 
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
@@ -107,15 +107,14 @@ public class NewProjectPage extends BorderPane {
         }
     }
 
-    private SoundAsset copyAudioToProjectFolder(FileHandle projectFile, FileHandle assetsFolder, String internalPath,
-                                                String title) {
+    private SoundAsset copyAudioToProjectFolder(FileHandle projectFile, FileHandle assetsFolder, String internalPath) {
         final ApplicationContext context = ApplicationContext.context();
         final FileHandle internalFile = context.files.internal(internalPath);
         final FileHandle assetFile = assetsFolder.child(internalFile.name());
         internalFile.copyTo(assetFile);
         final String assetPath = assetFile.path().substring(projectFile.parent().path().length() + 1);
         final float assetDuration = AssetUtils.audioFileLength(assetFile);
-        return SoundAsset.generateNewSoundAsset(title, assetPath, assetDuration);
+        return SoundAsset.generateNewSoundAsset(assetFile.nameWithoutExtension(), assetPath, assetDuration);
     }
 
     private ImageAsset copyTitleImageIntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder) {

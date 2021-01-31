@@ -155,13 +155,14 @@ public class SoundTab extends Tab {
         final ApplicationContext context = ApplicationContext.context();
         final FileHandle projectFile = context.currentProject.getProjectFileHandle();
         final FileHandle selectedFileHandle = this.validateSelectedFile(selectedFile);
-        final String soundTitle = selectedFileHandle.nameWithoutExtension();
-        final float soundLength = AssetUtils.audioFileLength(selectedFileHandle);
         final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
         final FileHandle assetFile = AssetUtils.getFileAsNonExistent(assetsFolder.child(selectedFileHandle.name()));
-        final String soundPath = AssetUtils.getFilePathRelativeTo(assetFile, projectFile.parent());
         selectedFileHandle.copyTo(assetFile);
-        return SoundAsset.generateNewSoundAsset(soundTitle, soundPath, soundLength);
+        return SoundAsset.generateNewSoundAsset(
+                assetFile.nameWithoutExtension(),
+                AssetUtils.getFilePathRelativeTo(assetFile, projectFile.parent()),
+                AssetUtils.audioFileLength(selectedFileHandle)
+        );
     }
 
     private FileHandle validateSelectedFile(File selectedFile) {
