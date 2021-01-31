@@ -51,13 +51,11 @@ public class SoundTab extends Tab {
                 this.volumeSlider
         );
 
-        final Button preview = buildPreviewButton(owner);
-
         final VBox rightControls = new VBox(ApplicationContext.Constants.SPACING);
         rightControls.getChildren().addAll(
                 this.buildImportButton(owner),
                 this.buildRemoveButton(owner),
-                preview,
+                this.buildPreviewButton(owner),
                 volumeBox
         );
 
