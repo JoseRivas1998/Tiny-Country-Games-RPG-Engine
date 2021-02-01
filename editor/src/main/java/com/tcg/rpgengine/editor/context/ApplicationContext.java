@@ -230,6 +230,7 @@ public class ApplicationContext {
         public static final String SYSTEM_FILE_NAME = "system.json";
         public static final int ASSET_MANAGER_WIDTH = 600;
         public static final int ASSET_MANAGER_HEIGHT = 600;
+        public static final int REQUIRED_WINDOW_SKIN_SIZE = 192;
     }
 
 }

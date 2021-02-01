@@ -2,6 +2,7 @@ package com.tcg.rpgengine.editor.containers;
 
 import com.tcg.rpgengine.editor.components.TitleEditorPane;
 import com.tcg.rpgengine.editor.components.SystemSoundEditorPane;
+import com.tcg.rpgengine.editor.components.UISkinEditorPane;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import javafx.geometry.Insets;
 import javafx.scene.layout.FlowPane;
@@ -16,7 +17,8 @@ public class DatabaseManagerPage extends FlowPane {
         this.setVgap(ApplicationContext.Constants.SPACING);
         this.getChildren().addAll(
                 new TitleEditorPane(owner),
-                new SystemSoundEditorPane(owner)
+                new SystemSoundEditorPane(owner),
+                new UISkinEditorPane(owner)
         );
     }
 
