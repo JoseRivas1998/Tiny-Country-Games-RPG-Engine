@@ -8,6 +8,7 @@ import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.common.data.system.Title;
 import com.tcg.rpgengine.common.data.system.UISounds;
+import com.tcg.rpgengine.common.data.system.WindowSkin;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.utils.AssetUtils;
@@ -64,7 +65,8 @@ public class NewProjectPage extends BorderPane {
                 final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
 
                 final SoundAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
-                final ImageAsset titleImage = this.copyTitleImageIntoProjectFolder(projectFile, assetsFolder);
+                final ImageAsset titleImage = this.copyImageIntoProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/title.png");
 
                 final SoundAsset cursor2 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
                         "initial_assets/cursor2.mp3");
@@ -74,6 +76,9 @@ public class NewProjectPage extends BorderPane {
                         "initial_assets/cancel2.mp3");
                 final SoundAsset buzzer1 = this.copyAudioToProjectFolder(projectFile, assetsFolder,
                         "initial_assets/buzzer1.mp3");
+
+                final ImageAsset uiSkinImage = this.copyImageIntoProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/ui_skin.png");
 
 
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
@@ -85,6 +90,8 @@ public class NewProjectPage extends BorderPane {
                 assetLibrary.addSoundEffectAsset(cancel1);
                 assetLibrary.addSoundEffectAsset(buzzer1);
 
+                assetLibrary.addImageAsset(uiSkinImage);
+
                 final FileHandle assetLibraryFile = projectFile.sibling(
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
                 );
@@ -93,7 +100,8 @@ public class NewProjectPage extends BorderPane {
                 final Title initialTitle = Title.createNewTitle(assetLibrary, projTitle, titleImage.id, theme6.id);
                 final UISounds initialUiSounds = UISounds.createNewUISounds(assetLibrary, cursor2.id, decision1.id,
                         cancel1.id, buzzer1.id);
-                final SystemData systemData = SystemData.createNewSystemData(initialTitle, initialUiSounds);
+                final WindowSkin windowSkin = WindowSkin.createWindowSkin(assetLibrary, uiSkinImage.id);
+                final SystemData systemData = SystemData.createNewSystemData(initialTitle, initialUiSounds, windowSkin);
 
                 final FileHandle systemFile = projectFile.sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
                 systemFile.writeString(systemData.jsonString(4), false);
@@ -117,13 +125,13 @@ public class NewProjectPage extends BorderPane {
         return SoundAsset.generateNewSoundAsset(assetFile.nameWithoutExtension(), assetPath, assetDuration);
     }
 
-    private ImageAsset copyTitleImageIntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder) {
+    private ImageAsset copyImageIntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder, String path) {
         final ApplicationContext context = ApplicationContext.context();
-        final FileHandle initialTitleFile = context.files.internal("initial_assets/title.png");
-        final FileHandle titleAssetFile = assetsFolder.child(initialTitleFile.name());
-        initialTitleFile.copyTo(titleAssetFile);
-        final String titlePath = titleAssetFile.path().substring(projectFile.parent().path().length() + 1);
-        return ImageAsset.generateNewImageAsset(titlePath);
+        final FileHandle initialImageFile = context.files.internal(path);
+        final FileHandle imageAssetFile = assetsFolder.child(initialImageFile.name());
+        initialImageFile.copyTo(imageAssetFile);
+        final String imagePath = AssetUtils.getFilePathRelativeTo(imageAssetFile, projectFile.parent());
+        return ImageAsset.generateNewImageAsset(imagePath);
     }
 
     private SoundAsset copyTheme6IntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder) {

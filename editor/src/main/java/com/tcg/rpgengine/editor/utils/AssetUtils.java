@@ -5,11 +5,12 @@ import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.FileImageInputStream;
+import java.awt.*;
 import java.io.IOException;
+import java.util.Iterator;
 
 public interface AssetUtils {
 
@@ -20,6 +21,24 @@ public interface AssetUtils {
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static Dimension imageSize(FileHandle imageFile) {
+        final Iterator<ImageReader> iter = ImageIO.getImageReadersBySuffix(imageFile.extension());
+        while (iter.hasNext()) {
+            final ImageReader reader = iter.next();
+            try (final FileImageInputStream stream = new FileImageInputStream(imageFile.file())) {
+                reader.setInput(stream);
+                final int width = reader.getWidth(reader.getMinIndex());
+                final int height = reader.getHeight(reader.getMinIndex());
+                return new Dimension(width, height);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                reader.dispose();
+            }
+        }
+        throw new RuntimeException("Unable to read image size.");
     }
 
     static FileHandle getFileAsNonExistent(FileHandle fileHandle) {
