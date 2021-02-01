@@ -37,6 +37,13 @@ public class GameDataLoader extends Thread{
             this.game.assetLibrary.addImageAsset(imageAsset);
         }
 
+        final FileHandle soundDataFile = Gdx.files.local("data/sound.tcgdat");
+        final ByteBuffer soundDataBytes = ByteBuffer.wrap(DataCompression.decompress(soundDataFile.readBytes()));
+        while(soundDataBytes.hasRemaining()) {
+            final SoundAsset soundAsset = SoundAsset.createFromBytes(soundDataBytes);
+            this.game.assetLibrary.addSoundEffectAsset(soundAsset);
+        }
+
         final FileHandle systemDataFile = Gdx.files.local("data/system.tcgdat");
         final ByteBuffer systemDataBytes = ByteBuffer.wrap(DataCompression.decompress(systemDataFile.readBytes()));
         this.game.systemData = SystemData.createFromBytes(this.game.assetLibrary, systemDataBytes);

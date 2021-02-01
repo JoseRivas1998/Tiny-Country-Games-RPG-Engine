@@ -151,6 +151,12 @@ public class ApplicationContext {
             final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.imageAssetBytes());
             imageDataFile.writeBytes(compressedBytes, false);
         });
+        taskSequence.addTask("Compiling Sound Effects", () -> {
+            this.copyAssetCollectionToLocal(assetLibrary.getAllSoundEffectAssets(), soundAsset -> soundAsset.path);
+            final FileHandle soundDataFile = this.files.local("data/sound.tcgdat");
+            byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.soundAssetBytes());
+            soundDataFile.writeBytes(compressedBytes, false);
+        });
         taskSequence.addTask("Compiling System", () -> {
             final FileHandle systemDataFile = this.files.local("data/system.tcgdat");
             final byte[] compressedBytes = DataCompression.compress(this.currentProject.systemData.toBytes());
