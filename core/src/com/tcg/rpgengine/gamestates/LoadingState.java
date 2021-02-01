@@ -2,6 +2,7 @@ package com.tcg.rpgengine.gamestates;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -14,9 +15,12 @@ import com.tcg.rpgengine.TCGRPGGame;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.system.Title;
+import com.tcg.rpgengine.common.data.system.UISounds;
+import com.tcg.rpgengine.common.data.system.WindowSkin;
 import com.tcg.rpgengine.utils.GameConstants;
 import com.tcg.rpgengine.utils.GameDataLoader;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LoadingState implements GameState {
@@ -58,17 +62,50 @@ public class LoadingState implements GameState {
         this.loadGothicFont("gothic72.ttf", 72, 3);
 
         final GameDataLoader gameDataLoader = new GameDataLoader(this.game, () -> {
-            final Title title = this.game.systemData.title;
-            final ImageAsset titleImage = this.game.assetLibrary.getImageAssetById(title.getImageId());
-            this.game.localAssetManager.load(titleImage.path, Texture.class);
-            final SoundAsset titleMusicAsset = this.game.assetLibrary.getMusicAssetById(title.getMusicId());
-            this.game.localAssetManager.load(titleMusicAsset.path, Music.class);
+            this.loadTitleAssets();
+            this.loadUiSoundAssets();
+            this.loadWindowSkinAssets();
+
             this.decodingAssetData.set(false);
         });
         gameDataLoader.start();
 
         this.currentStateTime = 0;
         this.currentState = LoadingStates.FadeIn;
+    }
+
+    private void loadWindowSkinAssets() {
+        final WindowSkin windowSkin = this.game.systemData.windowSkin;
+        this.loadImageAsset(windowSkin.getWindowSkinId());
+    }
+
+    private void loadUiSoundAssets() {
+        final UISounds uiSounds = this.game.systemData.uiSounds;
+        this.loadSoundEffectAsset(uiSounds.getCursorId());
+        this.loadSoundEffectAsset(uiSounds.getOkId());
+        this.loadSoundEffectAsset(uiSounds.getBuzzerId());
+        this.loadSoundEffectAsset(uiSounds.getCancelId());
+    }
+
+    private void loadTitleAssets() {
+        final Title title = this.game.systemData.title;
+        this.loadImageAsset(title.getImageId());
+        this.loadMusicAsset(title.getMusicId());
+    }
+
+    private void loadSoundEffectAsset(UUID soundId) {
+        final SoundAsset sound = this.game.assetLibrary.getSoundEffectAssetBytId(soundId);
+        this.game.localAssetManager.load(sound.path, Sound.class);
+    }
+
+    private void loadMusicAsset(UUID musicId) {
+        final SoundAsset music = this.game.assetLibrary.getMusicAssetById(musicId);
+        this.game.localAssetManager.load(music.path, Music.class);
+    }
+
+    private void loadImageAsset(UUID imageId) {
+        final ImageAsset image = this.game.assetLibrary.getImageAssetById(imageId);
+        this.game.localAssetManager.load(image.path, Texture.class);
     }
 
     protected void loadGothicFont(String fontName, int fontSize, float borderWidth) {

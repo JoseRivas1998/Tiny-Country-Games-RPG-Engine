@@ -46,6 +46,9 @@ public class WindowSkin implements JSONDocument, BinaryDocument {
         }
     }
 
+    public UUID getWindowSkinId() {
+        return this.imageId;
+    }
 
     @Override
     public JSONObject toJSON() {
