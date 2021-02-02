@@ -59,6 +59,7 @@ public class LoadingState implements GameState {
         this.splashImageRect.y = GameConstants.VIEW_HEIGHT * 0.5f - this.splashImageRect.height * 0.5f;
 
         this.loadGothicFont("gothic24.ttf", 24, 2);
+        this.loadGothicFont("gothic48.ttf", 48, 2);
         this.loadGothicFont("gothic72.ttf", 72, 3);
 
         final GameDataLoader gameDataLoader = new GameDataLoader(this.game, () -> {

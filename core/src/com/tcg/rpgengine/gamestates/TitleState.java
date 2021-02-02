@@ -1,7 +1,9 @@
 package com.tcg.rpgengine.gamestates;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -10,8 +12,13 @@ import com.tcg.rpgengine.TCGRPGGame;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.system.Title;
+import com.tcg.rpgengine.common.data.system.UISounds;
+import com.tcg.rpgengine.ui.Menu;
 import com.tcg.rpgengine.ui.TextBounds;
+import com.tcg.rpgengine.ui.Window;
 import com.tcg.rpgengine.utils.GameConstants;
+
+import java.util.Optional;
 
 public class TitleState implements GameState {
 
@@ -20,6 +27,10 @@ public class TitleState implements GameState {
     private Viewport viewport;
     private Music titleMusic;
     private TextBounds titleText;
+    private Menu<String> mainMenu;
+    private Sound cursor;
+    private Sound ok;
+    private Sound buzzer;
 
     public TitleState(TCGRPGGame game) {
         this.game = game;
@@ -43,12 +54,44 @@ public class TitleState implements GameState {
 
         Gdx.graphics.setTitle(titleData.title);
 
+        final BitmapFont gothic48Font = this.game.internalAssetManager.get("gothic48.ttf", BitmapFont.class);
+        this.mainMenu = Menu.newMenu(this.game, gothic48Font, "New Game", "Continue", "Quit");
+        this.mainMenu.setWidth(GameConstants.VIEW_WIDTH * 0.25f);
+        this.mainMenu.update();
+        this.mainMenu.setCenter(GameConstants.VIEW_WIDTH * 0.5f, GameConstants.VIEW_HEIGHT * .25f);
+
+        final UISounds uiSounds = this.game.systemData.uiSounds;
+        final SoundAsset cursorAsset = this.game.assetLibrary.getSoundEffectAssetBytId(uiSounds.getCursorId());
+        final SoundAsset okAsset = this.game.assetLibrary.getSoundEffectAssetBytId(uiSounds.getOkId());
+        final SoundAsset buzzerAsset = this.game.assetLibrary.getSoundEffectAssetBytId(uiSounds.getBuzzerId());
+        this.cursor = this.game.localAssetManager.get(cursorAsset.path, Sound.class);
+        this.ok = this.game.localAssetManager.get(okAsset.path, Sound.class);
+        this.buzzer = this.game.localAssetManager.get(buzzerAsset.path, Sound.class);
+
         this.titleMusic.play();
     }
 
     @Override
     public void handleInput(float deltaTime) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            this.cursor.play();
+            this.mainMenu.previous();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+            this.cursor.play();
+            this.mainMenu.next();
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            final Optional<String> selectedItemOptional = this.mainMenu.getSelectedItem();
+            if (selectedItemOptional.isPresent()) {
+                this.ok.play();
+                final String selectedItem = selectedItemOptional.get();
+                System.out.println(selectedItem);
 
+            } else {
+                this.buzzer.play();
+            }
+        }
     }
 
     @Override
@@ -63,6 +106,7 @@ public class TitleState implements GameState {
         this.game.batch.setProjectionMatrix(this.viewport.getCamera().combined);
         this.game.batch.draw(this.backgroundImage, 0, 0, GameConstants.VIEW_WIDTH, GameConstants.VIEW_HEIGHT);
         this.titleText.draw(this.game.batch);
+        this.mainMenu.draw(this.game.batch, delta);
         this.game.batch.end();
 
     }

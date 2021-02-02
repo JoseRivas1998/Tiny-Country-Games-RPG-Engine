@@ -21,7 +21,7 @@ public class TextBounds {
     private boolean wrap;
 
     public TextBounds(BitmapFont font, String text, float targetWidth, int halign, boolean wrap) {
-        this.font = font;
+        this.font = Objects.requireNonNull(font);
         this.gl = new GlyphLayout();
         this.targetWidth = targetWidth;
         this.halign = halign;
@@ -63,16 +63,16 @@ public class TextBounds {
         return this.bounds.getX();
     }
 
-    public Rectangle setX(float x) {
-        return this.bounds.setX(x);
+    public void setX(float x) {
+        this.bounds.setX(x);
     }
 
     public float getY() {
         return this.bounds.getY();
     }
 
-    public Rectangle setY(float y) {
-        return this.bounds.setY(y);
+    public void setY(float y) {
+        this.bounds.setY(y);
     }
 
     public Vector2 getPosition(Vector2 position) {
@@ -89,6 +89,10 @@ public class TextBounds {
 
     public float getWidth() {
         return this.bounds.getWidth();
+    }
+
+    public float getTargetWidth() {
+        return this.targetWidth;
     }
 
     public float getHeight() {
