@@ -1,7 +1,6 @@
 package com.tcg.rpgengine.gamestates;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,7 +16,6 @@ import com.tcg.rpgengine.input.ControlInput;
 import com.tcg.rpgengine.input.Controls;
 import com.tcg.rpgengine.ui.Menu;
 import com.tcg.rpgengine.ui.TextBounds;
-import com.tcg.rpgengine.ui.Window;
 import com.tcg.rpgengine.utils.GameConstants;
 
 import java.util.Optional;
@@ -29,10 +27,13 @@ public class TitleState implements GameState {
     private Viewport viewport;
     private Music titleMusic;
     private TextBounds titleText;
-    private Menu<String> mainMenu;
+    private Menu<MenuItems> mainMenu;
     private Sound cursor;
     private Sound ok;
     private Sound buzzer;
+    private boolean selected;
+    private float selectTimer;
+    private float selectTimeDuration;
 
     public TitleState(TCGRPGGame game) {
         this.game = game;
@@ -57,7 +58,9 @@ public class TitleState implements GameState {
         Gdx.graphics.setTitle(titleData.title);
 
         final BitmapFont gothic48Font = this.game.internalAssetManager.get("gothic48.ttf", BitmapFont.class);
-        this.mainMenu = Menu.newMenu(this.game, gothic48Font, "New Game", "Continue", "Quit");
+        this.mainMenu = Menu.newMenu(this.game, gothic48Font, MenuItems.values());
+        this.mainMenu.setMenuItemToString(menuItem -> menuItem.text);
+        this.mainMenu.setDisabled(MenuItems.CONTINUE, true);
         this.mainMenu.setWidth(GameConstants.VIEW_WIDTH * 0.25f);
         this.mainMenu.update();
         this.mainMenu.setCenter(GameConstants.VIEW_WIDTH * 0.5f, GameConstants.VIEW_HEIGHT * .25f);
@@ -69,36 +72,54 @@ public class TitleState implements GameState {
         this.cursor = this.game.localAssetManager.get(cursorAsset.path, Sound.class);
         this.ok = this.game.localAssetManager.get(okAsset.path, Sound.class);
         this.buzzer = this.game.localAssetManager.get(buzzerAsset.path, Sound.class);
+        this.selectTimeDuration = okAsset.duration;
 
-//        this.titleMusic.play();
+        this.titleMusic.play();
     }
 
     @Override
     public void handleInput(float deltaTime) {
-        if (ControlInput.controlCheckPressed(Controls.MOVE_UP)) {
-            this.cursor.play();
-            this.mainMenu.previous();
-        }
-        if (ControlInput.controlCheckPressed(Controls.MOVE_DOWN)) {
-            this.cursor.play();
-            this.mainMenu.next();
-        }
-        if (ControlInput.controlCheckPressed(Controls.ACTION)) {
-            final Optional<String> selectedItemOptional = this.mainMenu.getSelectedItem();
-            if (selectedItemOptional.isPresent()) {
-                this.ok.play();
-                final String selectedItem = selectedItemOptional.get();
-                System.out.println(selectedItem);
-
-            } else {
-                this.buzzer.play();
+        if (!this.selected) {
+            if (ControlInput.controlCheckPressed(Controls.MOVE_UP)) {
+                this.cursor.play();
+                this.mainMenu.previous();
+            }
+            if (ControlInput.controlCheckPressed(Controls.MOVE_DOWN)) {
+                this.cursor.play();
+                this.mainMenu.next();
+            }
+            if (ControlInput.controlCheckPressed(Controls.ACTION)) {
+                if (this.mainMenu.getSelectedItem().isPresent()) {
+                    this.ok.play();
+                    this.selected = true;
+                    this.selectTimer = 0f;
+                } else {
+                    this.buzzer.play();
+                }
             }
         }
     }
 
     @Override
     public void update(float deltaTime) {
-
+        if (this.selected) {
+            this.selectTimer += deltaTime;
+            if (Float.compare(this.selectTimer, this.selectTimeDuration) >= 0) {
+                this.mainMenu.getSelectedItem().ifPresent(menuItem -> {
+                    switch (menuItem) {
+                        case NEW_GAME:
+                            break;
+                        case CONTINUE:
+                            break;
+                        case QUIT:
+                            Gdx.app.exit();
+                            break;
+                    }
+                });
+            }
+        } else {
+            this.selectTimer = 0f;
+        }
     }
 
     @Override
@@ -131,6 +152,17 @@ public class TitleState implements GameState {
     @Override
     public void dispose() {
         this.titleMusic.stop();
+    }
+
+    private enum MenuItems {
+        NEW_GAME("New Game"),
+        CONTINUE("Continue"),
+        QUIT("Quit");
+        final String text;
+
+        MenuItems(String text) {
+            this.text = text;
+        }
     }
 
     
