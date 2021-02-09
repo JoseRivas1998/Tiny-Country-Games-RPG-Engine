@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.LocalFileHandleResolver;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -16,6 +17,7 @@ import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.game.GameStateEngine;
 import com.tcg.rpgengine.gamestates.LoadingState;
 import com.tcg.rpgengine.input.ControlInput;
+import com.tcg.rpgengine.input.ControllerInputProcessor;
 import com.tcg.rpgengine.input.KeyboardInputProcessor;
 
 public class TCGRPGGame extends ApplicationAdapter {
@@ -42,6 +44,7 @@ public class TCGRPGGame extends ApplicationAdapter {
 		this.initializeInternalFreetypeFontLoader();
 
 		Gdx.input.setInputProcessor(new KeyboardInputProcessor());
+		Controllers.addListener(new ControllerInputProcessor());
 
 		this.assetLibrary = AssetLibrary.newAssetLibrary();
 		this.stateEngine = new GameStateEngine();
