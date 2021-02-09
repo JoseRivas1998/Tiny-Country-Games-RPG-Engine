@@ -13,6 +13,8 @@ import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.system.Title;
 import com.tcg.rpgengine.common.data.system.UISounds;
+import com.tcg.rpgengine.input.ControlInput;
+import com.tcg.rpgengine.input.Controls;
 import com.tcg.rpgengine.ui.Menu;
 import com.tcg.rpgengine.ui.TextBounds;
 import com.tcg.rpgengine.ui.Window;
@@ -68,20 +70,20 @@ public class TitleState implements GameState {
         this.ok = this.game.localAssetManager.get(okAsset.path, Sound.class);
         this.buzzer = this.game.localAssetManager.get(buzzerAsset.path, Sound.class);
 
-        this.titleMusic.play();
+//        this.titleMusic.play();
     }
 
     @Override
     public void handleInput(float deltaTime) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+        if (ControlInput.controlCheckPressed(Controls.MOVE_UP)) {
             this.cursor.play();
             this.mainMenu.previous();
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+        if (ControlInput.controlCheckPressed(Controls.MOVE_DOWN)) {
             this.cursor.play();
             this.mainMenu.next();
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+        if (ControlInput.controlCheckPressed(Controls.ACTION)) {
             final Optional<String> selectedItemOptional = this.mainMenu.getSelectedItem();
             if (selectedItemOptional.isPresent()) {
                 this.ok.play();
@@ -130,4 +132,6 @@ public class TitleState implements GameState {
     public void dispose() {
         this.titleMusic.stop();
     }
+
+    
 }

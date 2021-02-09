@@ -15,6 +15,8 @@ import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.game.GameStateEngine;
 import com.tcg.rpgengine.gamestates.LoadingState;
+import com.tcg.rpgengine.input.ControlInput;
+import com.tcg.rpgengine.input.KeyboardInputProcessor;
 
 public class TCGRPGGame extends ApplicationAdapter {
 	public SpriteBatch batch;
@@ -39,6 +41,8 @@ public class TCGRPGGame extends ApplicationAdapter {
 		this.internalAssetManager = new AssetManager();
 		this.initializeInternalFreetypeFontLoader();
 
+		Gdx.input.setInputProcessor(new KeyboardInputProcessor());
+
 		this.assetLibrary = AssetLibrary.newAssetLibrary();
 		this.stateEngine = new GameStateEngine();
 		this.stateEngine.setState(new LoadingState(this));
@@ -58,6 +62,7 @@ public class TCGRPGGame extends ApplicationAdapter {
 
 		final float deltaTime = Gdx.graphics.getDeltaTime();
 		this.stateEngine.step(deltaTime);
+		ControlInput.update();
 	}
 
 	@Override
