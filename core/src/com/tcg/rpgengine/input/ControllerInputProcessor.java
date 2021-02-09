@@ -72,7 +72,7 @@ public class ControllerInputProcessor extends MappedControllerAdapter {
         return false;
     }
 
-    private class AxisMapping {
+    private static class AxisMapping {
         final Controls negativeControl;
         final Controls positiveControl;
 
