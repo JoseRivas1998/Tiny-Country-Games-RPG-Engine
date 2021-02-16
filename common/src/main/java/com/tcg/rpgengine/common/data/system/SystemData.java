@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SystemData implements JSONDocument, BinaryDocument {
 
@@ -114,6 +115,10 @@ public class SystemData implements JSONDocument, BinaryDocument {
 
     private int getGlobalVariableReferenceCount(UUID id) {
         return this.globalVariableReferenceCount.getOrDefault(id, 0);
+    }
+
+    public List<GlobalVariable> getAllGlobalVariables() {
+        return new ArrayList<>(this.globalVariables.values());
     }
 
     @Override
