@@ -133,9 +133,11 @@ public class SystemData implements JSONDocument, BinaryDocument {
 
     private JSONArray globalVariablesToJSONArray() {
         final JSONArray globalVariables = new JSONArray();
-        for (GlobalVariable globalVariable : this.globalVariables.values()) {
-            globalVariables.put(globalVariable.toJSON());
-        }
+        this.globalVariables.values()
+                .stream()
+                .sorted(Comparator.comparing(globalVariable -> globalVariable.getName().toLowerCase()))
+                .map(GlobalVariable::toJSON)
+                .forEach(globalVariables::put);
         return globalVariables;
     }
 
