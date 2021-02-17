@@ -72,4 +72,25 @@ public class GlobalFlag implements JSONDocument, BinaryDocument {
         bytes.put(this.initialValue ? (byte) 0xFF : 0x00);
         return bytes.array();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        boolean result = this == obj;
+        if (!result) {
+            if (obj == null || this.getClass() != obj.getClass()) {
+                result = false;
+            } else {
+                GlobalFlag other = (GlobalFlag) obj;
+                result = this.initialValue == other.initialValue
+                        && this.id.equals(other.id)
+                        && this.name.equals(other.name);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id, this.name, this.initialValue);
+    }
 }
