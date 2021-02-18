@@ -25,31 +25,53 @@ public class GlobalVariableEditor extends VBox {
 
     public GlobalVariableEditor(Window owner) {
         super(ApplicationContext.Constants.SPACING);
+        this.globalVariableTableView = this.buildGlobalVariableTableView();
+        this.getChildren().addAll(this.buildTitleLabel(), this.globalVariableTableView, this.buildButtonBox(owner));
+    }
+
+    private Label buildTitleLabel() {
         final Label title = new Label("Global Variables");
         title.setStyle("-fx-font-weight: bold;");
+        return title;
+    }
 
+    private HBox buildButtonBox(Window owner) {
+
+        final HBox actionBox = new HBox(ApplicationContext.Constants.SPACING);
+        actionBox.setAlignment(Pos.CENTER_RIGHT);
+        actionBox.getChildren().addAll(
+                this.buildAddButton(owner),
+                this.buildEditButton(owner),
+                this.buildRemoveButton(owner));
+        return actionBox;
+    }
+
+    private Button buildRemoveButton(Window owner) {
+        final Button remove = new Button("Remove");
+        remove.disableProperty().bind(this.globalVariableTableView.getSelectionModel().selectedItemProperty().isNull());
+        remove.setOnAction(event -> this.removeSelectedGlobalVariable(owner));
+        return remove;
+    }
+
+    private Button buildEditButton(Window owner) {
+        final Button edit = new Button("Edit");
+        edit.disableProperty().bind(this.globalVariableTableView.getSelectionModel().selectedItemProperty().isNull());
+        edit.setOnAction(event -> this.editSelectedGlobalVariable(owner));
+        return edit;
+    }
+
+    private Button buildAddButton(Window owner) {
+        final Button add = new Button("Add");
+        add.setOnAction(event -> this.inputNewGlobalVariable(owner));
+        return add;
+    }
+
+    private GlobalVariableTableView buildGlobalVariableTableView() {
         final GlobalVariableTableView globalVariableTableView = new GlobalVariableTableView();
         globalVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         globalVariableTableView.getItems().setAll(ApplicationContext.context().currentProject.systemData.getAllGlobalVariables());
         VBox.setVgrow(globalVariableTableView, Priority.ALWAYS);
-        this.globalVariableTableView = globalVariableTableView;
-
-        final Button add = new Button("Add");
-        add.setOnAction(event -> this.inputNewGlobalVariable(owner));
-
-        final Button edit = new Button("Edit");
-        edit.disableProperty().bind(this.globalVariableTableView.getSelectionModel().selectedItemProperty().isNull());
-        edit.setOnAction(event -> this.editSelectedGlobalVariable(owner));
-
-        final Button remove = new Button("Remove");
-        remove.disableProperty().bind(this.globalVariableTableView.getSelectionModel().selectedItemProperty().isNull());
-        remove.setOnAction(event -> this.removeSelectedGlobalVariable(owner));
-
-        final HBox actionBox = new HBox(ApplicationContext.Constants.SPACING);
-        actionBox.setAlignment(Pos.CENTER_RIGHT);
-        actionBox.getChildren().addAll(add, edit, remove);
-
-        this.getChildren().addAll(title, globalVariableTableView, actionBox);
+        return globalVariableTableView;
     }
 
     private void removeSelectedGlobalVariable(Window owner) {
