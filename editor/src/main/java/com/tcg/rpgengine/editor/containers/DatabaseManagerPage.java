@@ -1,9 +1,6 @@
 package com.tcg.rpgengine.editor.containers;
 
-import com.tcg.rpgengine.editor.components.GlobalVariableEditor;
-import com.tcg.rpgengine.editor.components.TitleEditorPane;
-import com.tcg.rpgengine.editor.components.SystemSoundEditorPane;
-import com.tcg.rpgengine.editor.components.UISkinEditorPane;
+import com.tcg.rpgengine.editor.components.*;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import javafx.geometry.Insets;
 import javafx.scene.layout.FlowPane;
@@ -21,7 +18,10 @@ public class DatabaseManagerPage extends GridPane {
         final GlobalVariableEditor globalVariableEditor = new GlobalVariableEditor(owner);
         GridPane.setVgrow(globalVariableEditor, Priority.ALWAYS);
         this.add(globalVariableEditor, 0, 0);
-        this.add(this.buildMainPane(owner), 1, 0);
+        final GlobalFlagEditor globalFlagEditor = new GlobalFlagEditor(owner);
+        GridPane.setVgrow(globalFlagEditor, Priority.ALWAYS);
+        this.add(globalFlagEditor, 0, 1);
+        this.add(this.buildMainPane(owner), 1, 0, 1, 2);
     }
 
     private FlowPane buildMainPane(Window owner) {

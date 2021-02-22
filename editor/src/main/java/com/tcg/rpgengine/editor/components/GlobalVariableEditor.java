@@ -1,6 +1,7 @@
 package com.tcg.rpgengine.editor.components;
 
 import com.tcg.rpgengine.common.data.system.GlobalVariable;
+import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.editor.components.tableviews.GlobalVariableTableView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.context.CurrentProject;
@@ -69,7 +70,8 @@ public class GlobalVariableEditor extends VBox {
     private GlobalVariableTableView buildGlobalVariableTableView() {
         final GlobalVariableTableView globalVariableTableView = new GlobalVariableTableView();
         globalVariableTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        globalVariableTableView.getItems().setAll(ApplicationContext.context().currentProject.systemData.getAllGlobalVariables());
+        final SystemData systemData = ApplicationContext.context().currentProject.systemData;
+        globalVariableTableView.getItems().setAll(systemData.getAllGlobalVariables());
         VBox.setVgrow(globalVariableTableView, Priority.ALWAYS);
         return globalVariableTableView;
     }
