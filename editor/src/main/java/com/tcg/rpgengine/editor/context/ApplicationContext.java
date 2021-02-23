@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.Asset;
+import com.tcg.rpgengine.common.data.assets.SpritesheetPageAsset;
 import com.tcg.rpgengine.common.utils.DataCompression;
 import com.tcg.rpgengine.editor.TestGameRunner;
 import com.tcg.rpgengine.editor.components.IconBar;
@@ -156,6 +157,13 @@ public class ApplicationContext {
             final FileHandle soundDataFile = this.files.local("data/sound.tcgdat");
             byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.soundAssetBytes());
             soundDataFile.writeBytes(compressedBytes, false);
+        });
+        taskSequence.addTask("Compiling Spritesheet Pages", () -> {
+            this.copyAssetCollectionToLocal(assetLibrary.getAllSpritesheetPages(), SpritesheetPageAsset::getPath);
+            final FileHandle spritesheetsDataFile = this.files.local("data/spritesheets.tcgdat");
+            final byte[] decompressedBytes = this.currentProject.assetLibrary.spritesheetPagesBytes();
+            final byte[] compressedBytes = DataCompression.compress(decompressedBytes);
+            spritesheetsDataFile.writeBytes(compressedBytes, false);
         });
         taskSequence.addTask("Compiling System", () -> {
             final FileHandle systemDataFile = this.files.local("data/system.tcgdat");
