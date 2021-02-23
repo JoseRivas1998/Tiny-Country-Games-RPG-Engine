@@ -3,6 +3,7 @@ package com.tcg.rpgengine.common.data;
 import com.tcg.rpgengine.common.data.assets.Asset;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
+import com.tcg.rpgengine.common.data.assets.SpritesheetPageAsset;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -15,9 +16,11 @@ public class AssetLibrary implements JSONDocument {
     private static final String JSON_MUSIC_FIELD = "music";
     private static final String JSON_IMAGES_FIELD = "images";
     private static final String JSON_SOUND_FIELD = "sound";
+    private static final String JSON_SPRITESHEET_PAGES_FIELD = "spritesheet_pages";
     private final Map<UUID, SoundAsset> music;
     private final Map<UUID, ImageAsset> images;
     private final Map<UUID, SoundAsset> soundEffects;
+    private final Map<UUID, SpritesheetPageAsset> spritesheetPages;
 
     private final Map<UUID, Integer> assetReferenceCount;
 
@@ -26,6 +29,7 @@ public class AssetLibrary implements JSONDocument {
         this.images = new HashMap<>();
         this.soundEffects = new HashMap<>();
         this.assetReferenceCount = new HashMap<>();
+        this.spritesheetPages = new HashMap<>();
     }
 
     public static AssetLibrary newAssetLibrary() {
@@ -37,6 +41,7 @@ public class AssetLibrary implements JSONDocument {
         final JSONArray music = jsonObject.getJSONArray(JSON_MUSIC_FIELD);
         final JSONArray images = jsonObject.getJSONArray(JSON_IMAGES_FIELD);
         final JSONArray sound = jsonObject.getJSONArray(JSON_SOUND_FIELD);
+        final JSONArray spritesheetPages = jsonObject.getJSONArray(JSON_SPRITESHEET_PAGES_FIELD);
         final AssetLibrary assetLibrary = new AssetLibrary();
         for (int i = 0; i < music.length(); i++) {
             final SoundAsset soundAsset = SoundAsset.createFromJSON(music.getJSONObject(i).toString());
@@ -49,6 +54,11 @@ public class AssetLibrary implements JSONDocument {
         for (int i = 0; i < sound.length(); i++) {
             final SoundAsset soundAsset = SoundAsset.createFromJSON(sound.getJSONObject(i).toString());
             assetLibrary.soundEffects.put(soundAsset.id, soundAsset);
+        }
+        for (int i = 0; i < spritesheetPages.length(); i++) {
+            final String spritesheetJson = spritesheetPages.getJSONObject(i).toString();
+            final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createFromJSON(spritesheetJson);
+            assetLibrary.spritesheetPages.put(spritesheetPageAsset.id, spritesheetPageAsset);
         }
         return assetLibrary;
     }
@@ -132,6 +142,28 @@ public class AssetLibrary implements JSONDocument {
         return encodeAssetCollection(this.soundEffects.values());
     }
 
+    public SpritesheetPageAsset getSpritesheetPageAssetById(UUID spritesheetPageId) {
+        return getNonNullAsset(spritesheetPageId, this.spritesheetPages);
+    }
+
+    public List<SpritesheetPageAsset> getAllSpritesheetPages() {
+        return new ArrayList<>(this.spritesheetPages.values());
+    }
+
+    public void addSpritesheetPageAsset(SpritesheetPageAsset spritesheetPageAsset) {
+        Objects.requireNonNull(spritesheetPageAsset);
+        this.spritesheetPages.put(spritesheetPageAsset.id, spritesheetPageAsset);
+    }
+
+    public void deleteSpritesheetPageAsset(SpritesheetPageAsset spritesheetPageAsset) {
+        this.verifyReferenceCount(spritesheetPageAsset);
+        this.spritesheetPages.remove(spritesheetPageAsset.id);
+    }
+
+    public byte[] spritesheetPagesBytes() {
+        return encodeAssetCollection(this.spritesheetPages.values());
+    }
+
     private void verifyReferenceCount(Asset asset) {
         if (this.getReferenceCount(asset) > 0) {
             throw new IllegalStateException("This asset is referenced once or more. It cannot be deleted.");
@@ -172,6 +204,7 @@ public class AssetLibrary implements JSONDocument {
         jsonObject.put(JSON_MUSIC_FIELD, this.assetCollectionToJSONArray(this.music.values()));
         jsonObject.put(JSON_IMAGES_FIELD, this.assetCollectionToJSONArray(this.images.values()));
         jsonObject.put(JSON_SOUND_FIELD, this.assetCollectionToJSONArray(this.soundEffects.values()));
+        jsonObject.put(JSON_SPRITESHEET_PAGES_FIELD, this.assetCollectionToJSONArray(this.spritesheetPages.values()));
 
         return jsonObject;
     }
