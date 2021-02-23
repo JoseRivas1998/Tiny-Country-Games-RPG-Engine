@@ -31,17 +31,17 @@ public class SpritesheetPreviewCanvas extends ResizableCanvas {
         final double height = this.getHeight();
         final double paddedWidth = width - ApplicationContext.Constants.SPACING * 2;
         final double paddedHeight = height - ApplicationContext.Constants.SPACING * 2;
+        final double paddedAspectRatio = paddedWidth / paddedHeight;
 
         final GraphicsContext gc = this.getGraphicsContext2D();
         gc.setFill(Color.web("#000080"));
         gc.fillRect(0, 0, width, height);
 
         final Rectangle imageRect = new Rectangle();
+        imageRect.setWidth(paddedWidth);
+        imageRect.setHeight(paddedWidth * (1f / this.imageAspectRatio));
 
-        if (Double.compare(this.image.getWidth(), this.image.getHeight()) > 0) {
-            imageRect.setWidth(paddedWidth);
-            imageRect.setHeight(paddedWidth * (1f / this.imageAspectRatio));
-        } else {
+        if (Double.compare(imageRect.getHeight(), paddedHeight) >= 0) {
             imageRect.setHeight(paddedHeight);
             imageRect.setWidth(paddedHeight * this.imageAspectRatio);
         }

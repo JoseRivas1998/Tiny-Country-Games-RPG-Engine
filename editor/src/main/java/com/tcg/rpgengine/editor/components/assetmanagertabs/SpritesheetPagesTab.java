@@ -1,13 +1,17 @@
 package com.tcg.rpgengine.editor.components.assetmanagertabs;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.SpritesheetPageAsset;
 import com.tcg.rpgengine.editor.components.SimpleAssetListView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
+import com.tcg.rpgengine.editor.context.CurrentProject;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.dialogs.SpritesheetDialog;
+import com.tcg.rpgengine.editor.dialogs.SpritesheetPreviewDialog;
 import com.tcg.rpgengine.editor.utils.AssetUtils;
 import com.tcg.rpgengine.editor.utils.ExtensionUtils;
+import javafx.beans.binding.BooleanBinding;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -16,6 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Window;
 import javafx.util.Pair;
 
@@ -28,50 +33,14 @@ public class SpritesheetPagesTab extends Tab {
 
     public SpritesheetPagesTab(Window owner) {
         super("Spritesheet Pages");
-
-        final SimpleAssetListView<SpritesheetPageAsset> pageAssetSimpleAssetListView = new SimpleAssetListView<>(
-                SpritesheetPageAsset::getPath
-        );
-        pageAssetSimpleAssetListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        pageAssetSimpleAssetListView.getItems().setAll(ApplicationContext.context().currentProject.assetLibrary.getAllSpritesheetPages());
-        GridPane.setVgrow(pageAssetSimpleAssetListView, Priority.ALWAYS);
-        GridPane.setHgrow(pageAssetSimpleAssetListView, Priority.ALWAYS);
-
-        this.pageAssetSimpleAssetListView = pageAssetSimpleAssetListView;
-
-
-        final Button importButton = new Button("Import");
-        importButton.setMaxWidth(Double.MAX_VALUE);
-        importButton.setOnAction(event -> {
-            try {
-                final FileChooser fileChooser = new FileChooser();
-                fileChooser.getExtensionFilters().setAll(ExtensionUtils.supportedImageFiles());
-                final Optional<File> selectedFileOptional = Optional.ofNullable(fileChooser.showOpenDialog(owner));
-                selectedFileOptional.ifPresent(selectedFile -> {
-                    final FileHandle selectedFileHandle = this.selectedFileToValidatedFileHandle(selectedFile);
-                    final SpritesheetDialog spritesheetDialog = new SpritesheetDialog(selectedFileHandle);
-                    spritesheetDialog.initOwner(owner);
-                    final Optional<Pair<Integer, Integer>> optionalRowColPair = spritesheetDialog.showAndWait();
-                    if (optionalRowColPair.isPresent()) {
-                        final Pair<Integer, Integer> rowColPair = optionalRowColPair.get();
-                        final SpritesheetPageAsset spritesheetPageAsset = this.createSpritePageAsset(
-                                selectedFileHandle, rowColPair.getKey(), rowColPair.getValue()
-                        );
-                        ApplicationContext.context().currentProject.assetLibrary.addSpritesheetPageAsset(spritesheetPageAsset);
-                        ApplicationContext.context().currentProject.saveAssetLibrary();
-                        this.pageAssetSimpleAssetListView.getItems().add(spritesheetPageAsset);
-                    }
-
-                });
-            } catch (Exception e) {
-                final ErrorDialog errorDialog = new ErrorDialog(e);
-                errorDialog.initOwner(owner);
-                errorDialog.showAndWait();
-            }
-        });
+        this.pageAssetSimpleAssetListView = this.buildSpritesheetPageAssetListView();
 
         final VBox vBox = new VBox(ApplicationContext.Constants.SPACING);
-        vBox.getChildren().addAll(importButton);
+        vBox.getChildren().addAll(
+                this.buildImportButton(owner),
+                this.buildRemoveButton(owner),
+                this.buildPreviewButton(owner)
+        );
 
         final GridPane layout = new GridPane();
         layout.setHgap(ApplicationContext.Constants.SPACING);
@@ -83,6 +52,117 @@ public class SpritesheetPagesTab extends Tab {
         this.setContent(layout);
         this.setClosable(false);
 
+    }
+
+    private Button buildRemoveButton(Window owner) {
+        final Button remove = new Button("Remove");
+        remove.setMaxWidth(Double.MAX_VALUE);
+        remove.disableProperty().bind(this.selectionIsNullBinding());
+        remove.setOnAction(event -> this.removeSelectedSpritesheetAsset(owner));
+        return remove;
+    }
+
+    private void removeSelectedSpritesheetAsset(Window owner) {
+        this.getSelectedSpritesheet()
+                .ifPresent(spritesheetPageAsset -> this.removeSpritesheetAsset(owner, spritesheetPageAsset));
+    }
+
+    private void removeSpritesheetAsset(Window owner, SpritesheetPageAsset spritesheetPageAsset) {
+        try {
+            final CurrentProject currentProject = ApplicationContext.context().currentProject;
+            currentProject.assetLibrary.deleteSpritesheetPageAsset(spritesheetPageAsset);
+            currentProject.saveAssetLibrary();
+            final FileHandle assetFile = currentProject.getProjectFileHandle().sibling(spritesheetPageAsset.getPath());
+            assetFile.delete();
+            final int selectedIndex = this.pageAssetSimpleAssetListView.getSelectionModel().getSelectedIndex();
+            this.pageAssetSimpleAssetListView.getItems().remove(selectedIndex);
+        } catch (Exception e) {
+            final ErrorDialog errorDialog = new ErrorDialog(e);
+            errorDialog.initOwner(owner);
+            errorDialog.showAndWait();
+        }
+    }
+
+    private Button buildPreviewButton(Window owner) {
+        final Button preview = new Button("Preview");
+        preview.setMaxWidth(Double.MAX_VALUE);
+        preview.disableProperty().bind(this.selectionIsNullBinding());
+        preview.setOnAction(event -> this.previewSelectedAsset(owner));
+        return preview;
+    }
+
+    private BooleanBinding selectionIsNullBinding() {
+        return this.pageAssetSimpleAssetListView.getSelectionModel().selectedItemProperty().isNull();
+    }
+
+    private void previewSelectedAsset(Window owner) {
+        this.getSelectedSpritesheet().ifPresent(selectedAsset -> this.previewAsset(owner, selectedAsset));
+    }
+
+    private void previewAsset(Window owner, SpritesheetPageAsset selectedAsset) {
+        try {
+            final SpritesheetPreviewDialog previewDialog = new SpritesheetPreviewDialog(selectedAsset);
+            previewDialog.initOwner(owner);
+            previewDialog.initModality(Modality.APPLICATION_MODAL);
+            previewDialog.showAndWait();
+        } catch (Exception e) {
+            final ErrorDialog errorDialog = new ErrorDialog(e);
+            errorDialog.initOwner(owner);
+            errorDialog.showAndWait();
+        }
+    }
+
+    private Optional<SpritesheetPageAsset> getSelectedSpritesheet() {
+        return Optional.ofNullable(this.pageAssetSimpleAssetListView.getSelectionModel().getSelectedItem());
+    }
+
+    private Button buildImportButton(Window owner) {
+        final Button importButton = new Button("Import");
+        importButton.setMaxWidth(Double.MAX_VALUE);
+        importButton.setOnAction(event -> this.importSpritesheetPage(owner));
+        return importButton;
+    }
+
+    private void importSpritesheetPage(Window owner) {
+        try {
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().setAll(ExtensionUtils.supportedImageFiles());
+            final Optional<File> selectedFileOptional = Optional.ofNullable(fileChooser.showOpenDialog(owner));
+            selectedFileOptional.ifPresent(selectedFile -> this.importSpritesheetFromFile(owner, selectedFile));
+        } catch (Exception e) {
+            final ErrorDialog errorDialog = new ErrorDialog(e);
+            errorDialog.initOwner(owner);
+            errorDialog.showAndWait();
+        }
+    }
+
+    private void importSpritesheetFromFile(Window owner, File selectedFile) {
+        final FileHandle selectedFileHandle = this.selectedFileToValidatedFileHandle(selectedFile);
+        final SpritesheetDialog spritesheetDialog = new SpritesheetDialog(selectedFileHandle);
+        spritesheetDialog.initOwner(owner);
+        final Optional<Pair<Integer, Integer>> optionalRowColPair = spritesheetDialog.showAndWait();
+        if (optionalRowColPair.isPresent()) {
+            final Pair<Integer, Integer> rowColPair = optionalRowColPair.get();
+            final SpritesheetPageAsset spritesheetPageAsset = this.createSpritePageAsset(
+                    selectedFileHandle, rowColPair.getKey(), rowColPair.getValue()
+            );
+            final CurrentProject currentProject = ApplicationContext.context().currentProject;
+            currentProject.assetLibrary.addSpritesheetPageAsset(spritesheetPageAsset);
+            currentProject.saveAssetLibrary();
+            this.pageAssetSimpleAssetListView.getItems().add(spritesheetPageAsset);
+        }
+    }
+
+    private SimpleAssetListView<SpritesheetPageAsset> buildSpritesheetPageAssetListView() {
+        final AssetLibrary assetLibrary = ApplicationContext.context().currentProject.assetLibrary;
+        final SimpleAssetListView<SpritesheetPageAsset> pageAssetSimpleAssetListView = new SimpleAssetListView<>(
+                SpritesheetPageAsset::getPath
+        );
+        pageAssetSimpleAssetListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        pageAssetSimpleAssetListView.getItems().setAll(assetLibrary.getAllSpritesheetPages());
+        GridPane.setVgrow(pageAssetSimpleAssetListView, Priority.ALWAYS);
+        GridPane.setHgrow(pageAssetSimpleAssetListView, Priority.ALWAYS);
+        return pageAssetSimpleAssetListView;
     }
 
     private SpritesheetPageAsset createSpritePageAsset(FileHandle selectedFileHandle, int rows, int columns) {
