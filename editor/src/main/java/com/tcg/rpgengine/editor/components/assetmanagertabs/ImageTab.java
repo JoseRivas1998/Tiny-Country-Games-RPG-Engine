@@ -143,16 +143,8 @@ public class ImageTab extends Tab {
     }
 
     private ImageAsset createImageAsset(File selectedFile) {
-        final CurrentProject currentProject = ApplicationContext.context().currentProject;
         final FileHandle selectedFileHandle = this.validateSelectedFile(selectedFile);
-        final FileHandle projectFile = currentProject.getProjectFileHandle();
-        final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
-        final String assetFileName = selectedFileHandle.name()
-                .trim().toLowerCase().replaceAll("\\s", "_");
-        final FileHandle assetFile = AssetUtils.getFileAsNonExistent(assetsFolder.child(assetFileName));
-        final String imagePath = AssetUtils.getFilePathRelativeTo(assetFile, projectFile.parent());
-        selectedFileHandle.copyTo(assetFile);
-        return ImageAsset.generateNewImageAsset(imagePath);
+        return ImageAsset.generateNewImageAsset(AssetUtils.importExternalFileIntoAssetsFolder(selectedFileHandle));
     }
 
     private FileHandle validateSelectedFile(File selectedFile) {

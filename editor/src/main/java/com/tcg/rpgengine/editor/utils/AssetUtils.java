@@ -4,6 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
+import com.tcg.rpgengine.editor.context.ApplicationContext;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -58,6 +59,16 @@ public interface AssetUtils {
 
     static String getFilePathRelativeTo(FileHandle file, FileHandle relativeTo) {
         return relativeTo.file().toPath().relativize(file.file().toPath()).toString().replace("\\", "/");
+    }
+
+    static String importExternalFileIntoAssetsFolder(FileHandle externalFileHandle) {
+        final FileHandle projectFileHandle = ApplicationContext.context().currentProject.getProjectFileHandle();
+        final FileHandle assetsFolder = projectFileHandle.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
+        final String assetFileName = externalFileHandle.name()
+                .trim().toLowerCase().replaceAll("\\s", "_");
+        final FileHandle assetFile = AssetUtils.getFileAsNonExistent(assetsFolder.child(assetFileName));
+        externalFileHandle.copyTo(assetFile);
+        return AssetUtils.getFilePathRelativeTo(assetFile, projectFileHandle.parent());
     }
 
 }

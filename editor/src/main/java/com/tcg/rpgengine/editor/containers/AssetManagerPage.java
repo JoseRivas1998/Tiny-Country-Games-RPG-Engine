@@ -3,6 +3,7 @@ package com.tcg.rpgengine.editor.containers;
 import com.tcg.rpgengine.editor.components.assetmanagertabs.ImageTab;
 import com.tcg.rpgengine.editor.components.assetmanagertabs.MusicTab;
 import com.tcg.rpgengine.editor.components.assetmanagertabs.SoundTab;
+import com.tcg.rpgengine.editor.components.assetmanagertabs.SpritesheetPagesTab;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
@@ -15,7 +16,8 @@ public class AssetManagerPage extends TabPane {
         this.getTabs().addAll(
                 new MusicTab(stage),
                 new SoundTab(stage),
-                new ImageTab(stage)
+                new ImageTab(stage),
+                new SpritesheetPagesTab(stage)
         );
         this.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             ApplicationContext.context().jukebox.stopAll();
