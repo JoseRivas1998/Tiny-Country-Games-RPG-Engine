@@ -2,7 +2,7 @@ package com.tcg.rpgengine.editor.components.assetmanagertabs;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.AssetLibrary;
-import com.tcg.rpgengine.common.data.assets.SpritesheetPageAsset;
+import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.editor.components.SimpleAssetListView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.context.CurrentProject;
@@ -29,7 +29,7 @@ import java.util.Optional;
 
 public class SpritesheetPagesTab extends Tab {
 
-    private final SimpleAssetListView<SpritesheetPageAsset> pageAssetSimpleAssetListView;
+    private final SimpleAssetListView<TiledImageAsset> pageAssetSimpleAssetListView;
 
     public SpritesheetPagesTab(Window owner) {
         super("Spritesheet Pages");
@@ -67,12 +67,12 @@ public class SpritesheetPagesTab extends Tab {
                 .ifPresent(spritesheetPageAsset -> this.removeSpritesheetAsset(owner, spritesheetPageAsset));
     }
 
-    private void removeSpritesheetAsset(Window owner, SpritesheetPageAsset spritesheetPageAsset) {
+    private void removeSpritesheetAsset(Window owner, TiledImageAsset tiledImageAsset) {
         try {
             final CurrentProject currentProject = ApplicationContext.context().currentProject;
-            currentProject.assetLibrary.deleteSpritesheetPageAsset(spritesheetPageAsset);
+            currentProject.assetLibrary.deleteSpritesheetPageAsset(tiledImageAsset);
             currentProject.saveAssetLibrary();
-            final FileHandle assetFile = currentProject.getProjectFileHandle().sibling(spritesheetPageAsset.getPath());
+            final FileHandle assetFile = currentProject.getProjectFileHandle().sibling(tiledImageAsset.getPath());
             assetFile.delete();
             final int selectedIndex = this.pageAssetSimpleAssetListView.getSelectionModel().getSelectedIndex();
             this.pageAssetSimpleAssetListView.getItems().remove(selectedIndex);
@@ -99,7 +99,7 @@ public class SpritesheetPagesTab extends Tab {
         this.getSelectedSpritesheet().ifPresent(selectedAsset -> this.previewAsset(owner, selectedAsset));
     }
 
-    private void previewAsset(Window owner, SpritesheetPageAsset selectedAsset) {
+    private void previewAsset(Window owner, TiledImageAsset selectedAsset) {
         try {
             final SpritesheetPreviewDialog previewDialog = new SpritesheetPreviewDialog(selectedAsset);
             previewDialog.initOwner(owner);
@@ -112,7 +112,7 @@ public class SpritesheetPagesTab extends Tab {
         }
     }
 
-    private Optional<SpritesheetPageAsset> getSelectedSpritesheet() {
+    private Optional<TiledImageAsset> getSelectedSpritesheet() {
         return Optional.ofNullable(this.pageAssetSimpleAssetListView.getSelectionModel().getSelectedItem());
     }
 
@@ -143,20 +143,20 @@ public class SpritesheetPagesTab extends Tab {
         final Optional<Pair<Integer, Integer>> optionalRowColPair = spritesheetDialog.showAndWait();
         if (optionalRowColPair.isPresent()) {
             final Pair<Integer, Integer> rowColPair = optionalRowColPair.get();
-            final SpritesheetPageAsset spritesheetPageAsset = this.createSpritePageAsset(
+            final TiledImageAsset tiledImageAsset = this.createSpritePageAsset(
                     selectedFileHandle, rowColPair.getKey(), rowColPair.getValue()
             );
             final CurrentProject currentProject = ApplicationContext.context().currentProject;
-            currentProject.assetLibrary.addSpritesheetPageAsset(spritesheetPageAsset);
+            currentProject.assetLibrary.addSpritesheetPageAsset(tiledImageAsset);
             currentProject.saveAssetLibrary();
-            this.pageAssetSimpleAssetListView.getItems().add(spritesheetPageAsset);
+            this.pageAssetSimpleAssetListView.getItems().add(tiledImageAsset);
         }
     }
 
-    private SimpleAssetListView<SpritesheetPageAsset> buildSpritesheetPageAssetListView() {
+    private SimpleAssetListView<TiledImageAsset> buildSpritesheetPageAssetListView() {
         final AssetLibrary assetLibrary = ApplicationContext.context().currentProject.assetLibrary;
-        final SimpleAssetListView<SpritesheetPageAsset> pageAssetSimpleAssetListView = new SimpleAssetListView<>(
-                SpritesheetPageAsset::getPath
+        final SimpleAssetListView<TiledImageAsset> pageAssetSimpleAssetListView = new SimpleAssetListView<>(
+                TiledImageAsset::getPath
         );
         pageAssetSimpleAssetListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         pageAssetSimpleAssetListView.getItems().setAll(assetLibrary.getAllSpritesheetPages());
@@ -165,7 +165,7 @@ public class SpritesheetPagesTab extends Tab {
         return pageAssetSimpleAssetListView;
     }
 
-    private SpritesheetPageAsset createSpritePageAsset(FileHandle selectedFileHandle, int rows, int columns) {
+    private TiledImageAsset createSpritePageAsset(FileHandle selectedFileHandle, int rows, int columns) {
         if (rows <= 0) {
             throw new IllegalArgumentException("The number of rows must be at least one.");
         }
@@ -173,7 +173,7 @@ public class SpritesheetPagesTab extends Tab {
             throw new IllegalArgumentException("The number of columns must be at least one.");
         }
         final String imagePath = AssetUtils.importExternalFileIntoAssetsFolder(selectedFileHandle);
-        return SpritesheetPageAsset.createNewSpritesheetPageAsset(imagePath, rows, columns);
+        return TiledImageAsset.createNewSpritesheetPageAsset(imagePath, rows, columns);
     }
 
     private FileHandle selectedFileToValidatedFileHandle(File selectedFile) {

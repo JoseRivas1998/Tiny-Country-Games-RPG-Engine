@@ -5,7 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.TCGRPGGame;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
-import com.tcg.rpgengine.common.data.assets.SpritesheetPageAsset;
+import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.common.utils.DataCompression;
 
@@ -49,7 +49,7 @@ public class GameDataLoader extends Thread{
         final byte[] spritesheetPagesFileBytes = spritesheetPagesDataFile.readBytes();
         final ByteBuffer spritesheetDataBytes = ByteBuffer.wrap(DataCompression.decompress(spritesheetPagesFileBytes));
         while (spritesheetDataBytes.hasRemaining()) {
-            final SpritesheetPageAsset spritesheetPage = SpritesheetPageAsset.createFromBytes(spritesheetDataBytes);
+            final TiledImageAsset spritesheetPage = TiledImageAsset.createFromBytes(spritesheetDataBytes);
             this.game.assetLibrary.addSpritesheetPageAsset(spritesheetPage);
         }
 

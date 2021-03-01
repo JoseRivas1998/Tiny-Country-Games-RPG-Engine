@@ -1,13 +1,11 @@
 package com.tcg.rpgengine.editor.context;
 
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglFiles;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.Asset;
-import com.tcg.rpgengine.common.data.assets.SpritesheetPageAsset;
+import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.common.utils.DataCompression;
 import com.tcg.rpgengine.editor.TestGameRunner;
 import com.tcg.rpgengine.editor.components.IconBar;
@@ -30,9 +28,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
 
 public class ApplicationContext {
@@ -159,7 +155,7 @@ public class ApplicationContext {
             soundDataFile.writeBytes(compressedBytes, false);
         });
         taskSequence.addTask("Compiling Spritesheet Pages", () -> {
-            this.copyAssetCollectionToLocal(assetLibrary.getAllSpritesheetPages(), SpritesheetPageAsset::getPath);
+            this.copyAssetCollectionToLocal(assetLibrary.getAllSpritesheetPages(), TiledImageAsset::getPath);
             final FileHandle spritesheetsDataFile = this.files.local("data/spritesheets.tcgdat");
             final byte[] decompressedBytes = this.currentProject.assetLibrary.spritesheetPagesBytes();
             final byte[] compressedBytes = DataCompression.compress(decompressedBytes);

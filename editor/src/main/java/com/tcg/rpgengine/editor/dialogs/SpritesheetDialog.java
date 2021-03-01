@@ -1,7 +1,7 @@
 package com.tcg.rpgengine.editor.dialogs;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.tcg.rpgengine.common.data.assets.SpritesheetPageAsset;
+import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.editor.components.IntegerField;
 import com.tcg.rpgengine.editor.components.canvasses.SpritesheetPreviewCanvas;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
@@ -17,10 +17,10 @@ public class SpritesheetDialog extends Dialog<Pair<Integer, Integer>> {
     private final IntegerField rowField;
     private final IntegerField columnField;
 
-    public SpritesheetDialog(FileHandle fileHandle, SpritesheetPageAsset spritesheetPageAsset) {
+    public SpritesheetDialog(FileHandle fileHandle, TiledImageAsset tiledImageAsset) {
         this(fileHandle);
-        this.rowField.setIntValue(spritesheetPageAsset.rows);
-        this.columnField.setIntValue(spritesheetPageAsset.columns);
+        this.rowField.setIntValue(tiledImageAsset.rows);
+        this.columnField.setIntValue(tiledImageAsset.columns);
     }
 
     public SpritesheetDialog(FileHandle imageFile) {

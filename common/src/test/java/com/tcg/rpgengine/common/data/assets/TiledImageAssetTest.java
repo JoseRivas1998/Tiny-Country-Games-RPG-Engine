@@ -3,14 +3,13 @@ package com.tcg.rpgengine.common.data.assets;
 import com.tcg.rpgengine.common.TestUtils;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.mockito.internal.matchers.Null;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
 
-public class SpritesheetPageAssetTest {
+public class TiledImageAssetTest {
 
     private static final UUID TEST_ID = UUID.fromString("866b1e98-65e8-480b-9fd1-f8068ce08cc5");
     private static final String TEST_PATH = "assets/test_page.png";
@@ -45,87 +44,87 @@ public class SpritesheetPageAssetTest {
 
     @Test
     public void canCreateNewSpritesheetPage() {
-        final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createNewSpritesheetPageAsset(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewSpritesheetPageAsset(
                 TEST_PATH, TEST_ROWS, TEST_COLUMNS
         );
-        assertNotNull(spritesheetPageAsset);
-        assertEquals(TEST_PATH, spritesheetPageAsset.getPath());
-        assertEquals(TEST_ROWS, spritesheetPageAsset.rows);
-        assertEquals(TEST_COLUMNS, spritesheetPageAsset.columns);
+        assertNotNull(tiledImageAsset);
+        assertEquals(TEST_PATH, tiledImageAsset.getPath());
+        assertEquals(TEST_ROWS, tiledImageAsset.rows);
+        assertEquals(TEST_COLUMNS, tiledImageAsset.columns);
     }
 
     @Test
     public void cannotCreateSpritesheetWithNullPath() {
-        assertThrows(NullPointerException.class, () -> SpritesheetPageAsset.createNewSpritesheetPageAsset(
+        assertThrows(NullPointerException.class, () -> TiledImageAsset.createNewSpritesheetPageAsset(
                 null, TEST_ROWS, TEST_COLUMNS
         ));
     }
 
     @Test
     public void canSetPathOfSpritesheet() {
-        final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createNewSpritesheetPageAsset(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewSpritesheetPageAsset(
                 TEST_PATH, TEST_ROWS, TEST_COLUMNS
         );
-        assertEquals(TEST_PATH, spritesheetPageAsset.getPath());
+        assertEquals(TEST_PATH, tiledImageAsset.getPath());
         final String expectedPath = "assets/new_path.png";
-        spritesheetPageAsset.setPath(expectedPath);
-        assertEquals(expectedPath, spritesheetPageAsset.getPath());
+        tiledImageAsset.setPath(expectedPath);
+        assertEquals(expectedPath, tiledImageAsset.getPath());
     }
 
     @Test
     public void cannotSetPathOfSpritesheetToNull() {
-        final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createNewSpritesheetPageAsset(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewSpritesheetPageAsset(
                 TEST_PATH, TEST_ROWS, TEST_COLUMNS
         );
-        assertThrows(NullPointerException.class, () -> spritesheetPageAsset.setPath(null));
+        assertThrows(NullPointerException.class, () -> tiledImageAsset.setPath(null));
     }
 
     @Test
     public void verifyJSON() {
-        final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createNewSpritesheetPageAsset(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewSpritesheetPageAsset(
                 TEST_PATH, TEST_ROWS, TEST_COLUMNS
         );
         final JSONObject expectedJSON = new JSONObject(TEST_JSON_STRING);
-        expectedJSON.put("id", spritesheetPageAsset.id.toString());
-        final JSONObject actualJSON = spritesheetPageAsset.toJSON();
+        expectedJSON.put("id", tiledImageAsset.id.toString());
+        final JSONObject actualJSON = tiledImageAsset.toJSON();
         TestUtils.assertJSONObjectsEquals(expectedJSON, actualJSON);
     }
 
     @Test
     public void canCreateFromJSON() {
-        final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createFromJSON(TEST_JSON_STRING);
-        assertNotNull(spritesheetPageAsset);
-        assertEquals(TEST_ID, spritesheetPageAsset.id);
-        assertEquals(TEST_PATH, spritesheetPageAsset.getPath());
-        assertEquals(TEST_ROWS, spritesheetPageAsset.rows);
-        assertEquals(TEST_COLUMNS, spritesheetPageAsset.columns);
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createFromJSON(TEST_JSON_STRING);
+        assertNotNull(tiledImageAsset);
+        assertEquals(TEST_ID, tiledImageAsset.id);
+        assertEquals(TEST_PATH, tiledImageAsset.getPath());
+        assertEquals(TEST_ROWS, tiledImageAsset.rows);
+        assertEquals(TEST_COLUMNS, tiledImageAsset.columns);
     }
 
     @Test
     public void verifyNumberOfBytes() {
-        final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createFromJSON(TEST_JSON_STRING);
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createFromJSON(TEST_JSON_STRING);
         final int expectedLength = TEST_BYTES.length;
-        final int actualLength = spritesheetPageAsset.numberOfBytes();
+        final int actualLength = tiledImageAsset.numberOfBytes();
         assertEquals(expectedLength, actualLength);
     }
 
     @Test
     public void verifyToBytes() {
-        final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createFromJSON(TEST_JSON_STRING);
-        final byte[] actualBytes = spritesheetPageAsset.toBytes();
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createFromJSON(TEST_JSON_STRING);
+        final byte[] actualBytes = tiledImageAsset.toBytes();
         assertArrayEquals(TEST_BYTES, actualBytes);
     }
 
     @Test
     public void canCreateFromBytes() {
-        final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createFromBytes(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createFromBytes(
                 ByteBuffer.wrap(TEST_BYTES)
         );
-        assertNotNull(spritesheetPageAsset);
-        assertEquals(TEST_ID, spritesheetPageAsset.id);
-        assertEquals(TEST_PATH, spritesheetPageAsset.getPath());
-        assertEquals(TEST_ROWS, spritesheetPageAsset.rows);
-        assertEquals(TEST_COLUMNS, spritesheetPageAsset.columns);
+        assertNotNull(tiledImageAsset);
+        assertEquals(TEST_ID, tiledImageAsset.id);
+        assertEquals(TEST_PATH, tiledImageAsset.getPath());
+        assertEquals(TEST_ROWS, tiledImageAsset.rows);
+        assertEquals(TEST_COLUMNS, tiledImageAsset.columns);
     }
 
 }

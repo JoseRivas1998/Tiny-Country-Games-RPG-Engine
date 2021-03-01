@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
-public class SpritesheetPageAsset extends Asset {
+public class TiledImageAsset extends Asset {
 
     private static final String JSON_PATH_FIELD = "path";
     private static final String JSON_COLUMNS_FIELD = "columns";
@@ -17,32 +17,32 @@ public class SpritesheetPageAsset extends Asset {
     public int rows;
     public int columns;
 
-    public SpritesheetPageAsset(UUID id, String path, int rows, int columns) {
+    public TiledImageAsset(UUID id, String path, int rows, int columns) {
         super(id);
         this.setPath(path);
         this.rows = rows;
         this.columns = columns;
     }
 
-    public static SpritesheetPageAsset createNewSpritesheetPageAsset(String path, int rows, int columns) {
-        return new SpritesheetPageAsset(UuidUtils.generateUuid(), path, rows, columns);
+    public static TiledImageAsset createNewSpritesheetPageAsset(String path, int rows, int columns) {
+        return new TiledImageAsset(UuidUtils.generateUuid(), path, rows, columns);
     }
 
-    public static SpritesheetPageAsset createFromJSON(String jsonString) {
+    public static TiledImageAsset createFromJSON(String jsonString) {
         final JSONObject json = new JSONObject(jsonString);
         final UUID id = UuidUtils.fromString(json.getString(JSON_ID_FIELD));
         final String path = json.getString(JSON_PATH_FIELD);
         final int rows = json.getInt(JSON_ROWS_FIELD);
         final int columns = json.getInt(JSON_COLUMNS_FIELD);
-        return new SpritesheetPageAsset(id, path, rows, columns);
+        return new TiledImageAsset(id, path, rows, columns);
     }
 
-    public static SpritesheetPageAsset createFromBytes(ByteBuffer bytes) {
+    public static TiledImageAsset createFromBytes(ByteBuffer bytes) {
         final UUID id = BinaryDocument.getUuid(bytes);
         final String path = BinaryDocument.getUTF8String(bytes);
         final int rows = bytes.getInt();
         final int columns = bytes.getInt();
-        return new SpritesheetPageAsset(id, path, rows, columns);
+        return new TiledImageAsset(id, path, rows, columns);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class SpritesheetPageAsset extends Asset {
             } else if (!super.equals(o)){
                 result = false;
             } else {
-                SpritesheetPageAsset other = (SpritesheetPageAsset) o;
+                TiledImageAsset other = (TiledImageAsset) o;
                 result = this.rows == other.rows && this.columns == other.columns && this.path.equals(other.path);
             }
         }

@@ -3,7 +3,7 @@ package com.tcg.rpgengine.common.data;
 import com.tcg.rpgengine.common.data.assets.Asset;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
-import com.tcg.rpgengine.common.data.assets.SpritesheetPageAsset;
+import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,7 +20,7 @@ public class AssetLibrary implements JSONDocument {
     private final Map<UUID, SoundAsset> music;
     private final Map<UUID, ImageAsset> images;
     private final Map<UUID, SoundAsset> soundEffects;
-    private final Map<UUID, SpritesheetPageAsset> spritesheetPages;
+    private final Map<UUID, TiledImageAsset> spritesheetPages;
 
     private final Map<UUID, Integer> assetReferenceCount;
 
@@ -57,8 +57,8 @@ public class AssetLibrary implements JSONDocument {
         }
         for (int i = 0; i < spritesheetPages.length(); i++) {
             final String spritesheetJson = spritesheetPages.getJSONObject(i).toString();
-            final SpritesheetPageAsset spritesheetPageAsset = SpritesheetPageAsset.createFromJSON(spritesheetJson);
-            assetLibrary.spritesheetPages.put(spritesheetPageAsset.id, spritesheetPageAsset);
+            final TiledImageAsset tiledImageAsset = TiledImageAsset.createFromJSON(spritesheetJson);
+            assetLibrary.spritesheetPages.put(tiledImageAsset.id, tiledImageAsset);
         }
         return assetLibrary;
     }
@@ -142,22 +142,22 @@ public class AssetLibrary implements JSONDocument {
         return encodeAssetCollection(this.soundEffects.values());
     }
 
-    public SpritesheetPageAsset getSpritesheetPageAssetById(UUID spritesheetPageId) {
+    public TiledImageAsset getSpritesheetPageAssetById(UUID spritesheetPageId) {
         return getNonNullAsset(spritesheetPageId, this.spritesheetPages);
     }
 
-    public List<SpritesheetPageAsset> getAllSpritesheetPages() {
+    public List<TiledImageAsset> getAllSpritesheetPages() {
         return new ArrayList<>(this.spritesheetPages.values());
     }
 
-    public void addSpritesheetPageAsset(SpritesheetPageAsset spritesheetPageAsset) {
-        Objects.requireNonNull(spritesheetPageAsset);
-        this.spritesheetPages.put(spritesheetPageAsset.id, spritesheetPageAsset);
+    public void addSpritesheetPageAsset(TiledImageAsset tiledImageAsset) {
+        Objects.requireNonNull(tiledImageAsset);
+        this.spritesheetPages.put(tiledImageAsset.id, tiledImageAsset);
     }
 
-    public void deleteSpritesheetPageAsset(SpritesheetPageAsset spritesheetPageAsset) {
-        this.verifyReferenceCount(spritesheetPageAsset);
-        this.spritesheetPages.remove(spritesheetPageAsset.id);
+    public void deleteSpritesheetPageAsset(TiledImageAsset tiledImageAsset) {
+        this.verifyReferenceCount(tiledImageAsset);
+        this.spritesheetPages.remove(tiledImageAsset.id);
     }
 
     public byte[] spritesheetPagesBytes() {
