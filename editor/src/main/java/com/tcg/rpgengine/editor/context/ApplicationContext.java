@@ -161,6 +161,12 @@ public class ApplicationContext {
             final byte[] compressedBytes = DataCompression.compress(decompressedBytes);
             spritesheetsDataFile.writeBytes(compressedBytes, false);
         });
+        taskSequence.addTask("Compiling Tilesets", () -> {
+            this.copyAssetCollectionToLocal(assetLibrary.getAllTilesets(), TiledImageAsset::getPath);
+            final FileHandle tilesetsDataFile = this.files.local("data/tilesets.tcgdat");
+            final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.tilesetsBytes());
+            tilesetsDataFile.writeBytes(compressedBytes, false);
+        });
         taskSequence.addTask("Compiling System", () -> {
             final FileHandle systemDataFile = this.files.local("data/system.tcgdat");
             final byte[] compressedBytes = DataCompression.compress(this.currentProject.systemData.toBytes());
@@ -235,6 +241,7 @@ public class ApplicationContext {
         public static final int ASSET_MANAGER_WIDTH = 600;
         public static final int ASSET_MANAGER_HEIGHT = 600;
         public static final int REQUIRED_WINDOW_SKIN_SIZE = 192;
+        public static final String IMAGE_PREVIEW_BACKGROUND = "#000080";
     }
 
 }

@@ -173,7 +173,7 @@ public class SpritesheetPagesTab extends Tab {
             throw new IllegalArgumentException("The number of columns must be at least one.");
         }
         final String imagePath = AssetUtils.importExternalFileIntoAssetsFolder(selectedFileHandle);
-        return TiledImageAsset.createNewSpritesheetPageAsset(imagePath, rows, columns);
+        return TiledImageAsset.createNewTiledImageAsset(imagePath, rows, columns);
     }
 
     private FileHandle selectedFileToValidatedFileHandle(File selectedFile) {

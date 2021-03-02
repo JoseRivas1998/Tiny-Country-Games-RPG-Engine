@@ -24,7 +24,7 @@ public class TiledImageAsset extends Asset {
         this.columns = columns;
     }
 
-    public static TiledImageAsset createNewSpritesheetPageAsset(String path, int rows, int columns) {
+    public static TiledImageAsset createNewTiledImageAsset(String path, int rows, int columns) {
         return new TiledImageAsset(UuidUtils.generateUuid(), path, rows, columns);
     }
 

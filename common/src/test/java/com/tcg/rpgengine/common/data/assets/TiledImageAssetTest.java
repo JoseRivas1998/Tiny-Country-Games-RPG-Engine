@@ -44,7 +44,7 @@ public class TiledImageAssetTest {
 
     @Test
     public void canCreateNewSpritesheetPage() {
-        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewSpritesheetPageAsset(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewTiledImageAsset(
                 TEST_PATH, TEST_ROWS, TEST_COLUMNS
         );
         assertNotNull(tiledImageAsset);
@@ -55,14 +55,14 @@ public class TiledImageAssetTest {
 
     @Test
     public void cannotCreateSpritesheetWithNullPath() {
-        assertThrows(NullPointerException.class, () -> TiledImageAsset.createNewSpritesheetPageAsset(
+        assertThrows(NullPointerException.class, () -> TiledImageAsset.createNewTiledImageAsset(
                 null, TEST_ROWS, TEST_COLUMNS
         ));
     }
 
     @Test
     public void canSetPathOfSpritesheet() {
-        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewSpritesheetPageAsset(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewTiledImageAsset(
                 TEST_PATH, TEST_ROWS, TEST_COLUMNS
         );
         assertEquals(TEST_PATH, tiledImageAsset.getPath());
@@ -73,7 +73,7 @@ public class TiledImageAssetTest {
 
     @Test
     public void cannotSetPathOfSpritesheetToNull() {
-        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewSpritesheetPageAsset(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewTiledImageAsset(
                 TEST_PATH, TEST_ROWS, TEST_COLUMNS
         );
         assertThrows(NullPointerException.class, () -> tiledImageAsset.setPath(null));
@@ -81,7 +81,7 @@ public class TiledImageAssetTest {
 
     @Test
     public void verifyJSON() {
-        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewSpritesheetPageAsset(
+        final TiledImageAsset tiledImageAsset = TiledImageAsset.createNewTiledImageAsset(
                 TEST_PATH, TEST_ROWS, TEST_COLUMNS
         );
         final JSONObject expectedJSON = new JSONObject(TEST_JSON_STRING);
