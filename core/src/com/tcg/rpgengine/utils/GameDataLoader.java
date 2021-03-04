@@ -61,6 +61,14 @@ public class GameDataLoader extends Thread{
             this.game.assetLibrary.addTilesetAsset(tileset);
         }
 
+        final FileHandle iconsDataFile = Gdx.files.local("data/icons.tcgdat");
+        final byte[] iconsFileBytes = iconsDataFile.readBytes();
+        final ByteBuffer iconsDataBytes = ByteBuffer.wrap(DataCompression.decompress(iconsFileBytes));
+        while (iconsDataBytes.hasRemaining()) {
+            final TiledImageAsset iconPage = TiledImageAsset.createFromBytes(iconsDataBytes);
+            this.game.assetLibrary.addIconPageAsset(iconPage);
+        }
+
         final FileHandle systemDataFile = Gdx.files.local("data/system.tcgdat");
         final ByteBuffer systemDataBytes = ByteBuffer.wrap(DataCompression.decompress(systemDataFile.readBytes()));
         this.game.systemData = SystemData.createFromBytes(this.game.assetLibrary, systemDataBytes);

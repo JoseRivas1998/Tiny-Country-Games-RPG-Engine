@@ -167,6 +167,12 @@ public class ApplicationContext {
             final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.tilesetsBytes());
             tilesetsDataFile.writeBytes(compressedBytes, false);
         });
+        taskSequence.addTask("Compiling Icon Pages", () -> {
+            this.copyAssetCollectionToLocal(assetLibrary.getAllIconPages(), TiledImageAsset::getPath);
+            final FileHandle iconsDataFile = this.files.local("data/icons.tcgdat");
+            final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.iconPagesBytes());
+            iconsDataFile.writeBytes(compressedBytes, false);
+        });
         taskSequence.addTask("Compiling System", () -> {
             final FileHandle systemDataFile = this.files.local("data/system.tcgdat");
             final byte[] compressedBytes = DataCompression.compress(this.currentProject.systemData.toBytes());

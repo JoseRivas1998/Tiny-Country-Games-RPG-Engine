@@ -18,11 +18,13 @@ public class AssetLibrary implements JSONDocument {
     private static final String JSON_SOUND_FIELD = "sound";
     private static final String JSON_SPRITESHEET_PAGES_FIELD = "spritesheet_pages";
     private static final String JSON_TILESETS_FIELD = "tilesets";
+    private static final String JSON_ICON_PAGES_FIELD = "icon_pages";
     private final Map<UUID, SoundAsset> music;
     private final Map<UUID, ImageAsset> images;
     private final Map<UUID, SoundAsset> soundEffects;
     private final Map<UUID, TiledImageAsset> spritesheetPages;
     private final Map<UUID, TiledImageAsset> tilesets;
+    private final Map<UUID, TiledImageAsset> iconPages;
 
     private final Map<UUID, Integer> assetReferenceCount;
 
@@ -33,6 +35,7 @@ public class AssetLibrary implements JSONDocument {
         this.assetReferenceCount = new HashMap<>();
         this.spritesheetPages = new HashMap<>();
         this.tilesets = new HashMap<>();
+        this.iconPages = new HashMap<>();
     }
 
     public static AssetLibrary newAssetLibrary() {
@@ -46,6 +49,7 @@ public class AssetLibrary implements JSONDocument {
         final JSONArray sound = jsonObject.getJSONArray(JSON_SOUND_FIELD);
         final JSONArray spritesheetPages = jsonObject.getJSONArray(JSON_SPRITESHEET_PAGES_FIELD);
         final JSONArray tilesets = jsonObject.getJSONArray(JSON_TILESETS_FIELD);
+        final JSONArray iconPages = jsonObject.getJSONArray(JSON_ICON_PAGES_FIELD);
         final AssetLibrary assetLibrary = new AssetLibrary();
         for (int i = 0; i < music.length(); i++) {
             final SoundAsset soundAsset = SoundAsset.createFromJSON(music.getJSONObject(i).toString());
@@ -67,6 +71,10 @@ public class AssetLibrary implements JSONDocument {
         for (int i = 0; i < tilesets.length(); i++) {
             final TiledImageAsset tileset = TiledImageAsset.createFromJSON(tilesets.getJSONObject(i).toString());
             assetLibrary.tilesets.put(tileset.id, tileset);
+        }
+        for (int i = 0; i < iconPages.length(); i++) {
+            final TiledImageAsset iconPage = TiledImageAsset.createFromJSON(iconPages.getJSONObject(i).toString());
+            assetLibrary.iconPages.put(iconPage.id, iconPage);
         }
         return assetLibrary;
     }
@@ -194,6 +202,28 @@ public class AssetLibrary implements JSONDocument {
         return encodeAssetCollection(this.tilesets.values());
     }
 
+    public TiledImageAsset getIconPageById(UUID iconPageId) {
+        return getNonNullAsset(iconPageId, this.iconPages);
+    }
+
+    public List<TiledImageAsset> getAllIconPages() {
+        return new ArrayList<>(this.iconPages.values());
+    }
+
+    public void addIconPageAsset(TiledImageAsset tiledImageAsset) {
+        Objects.requireNonNull(tiledImageAsset);
+        this.iconPages.put(tiledImageAsset.id, tiledImageAsset);
+    }
+
+    public void deleteIconPageAsset(TiledImageAsset tiledImageAsset) {
+        this.verifyReferenceCount(Objects.requireNonNull(tiledImageAsset));
+        this.iconPages.remove(tiledImageAsset.id);
+    }
+
+    public byte[] iconPagesBytes() {
+        return encodeAssetCollection(this.iconPages.values());
+    }
+
     private void verifyReferenceCount(Asset asset) {
         if (this.getReferenceCount(asset) > 0) {
             throw new IllegalStateException("This asset is referenced once or more. It cannot be deleted.");
@@ -236,6 +266,7 @@ public class AssetLibrary implements JSONDocument {
         jsonObject.put(JSON_SOUND_FIELD, this.assetCollectionToJSONArray(this.soundEffects.values()));
         jsonObject.put(JSON_SPRITESHEET_PAGES_FIELD, this.assetCollectionToJSONArray(this.spritesheetPages.values()));
         jsonObject.put(JSON_TILESETS_FIELD, this.assetCollectionToJSONArray(this.tilesets.values()));
+        jsonObject.put(JSON_ICON_PAGES_FIELD, this.assetCollectionToJSONArray(this.iconPages.values()));
 
         return jsonObject;
     }

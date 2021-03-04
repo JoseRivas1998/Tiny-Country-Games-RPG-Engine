@@ -15,7 +15,8 @@ public class AssetManagerPage extends TabPane {
                 new SoundTab(stage),
                 new ImageTab(stage),
                 new SpritesheetPagesTab(stage),
-                new TilesetsTab(stage)
+                new TilesetsTab(stage),
+                new IconPagesTab(stage)
         );
         this.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             ApplicationContext.context().jukebox.stopAll();

@@ -5,6 +5,7 @@ import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.Project;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
+import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.common.data.system.Title;
 import com.tcg.rpgengine.common.data.system.UISounds;
@@ -81,6 +82,10 @@ public class NewProjectPage extends BorderPane {
                         "initial_assets/ui_skin.png");
 
 
+                final TiledImageAsset defaultIconSet = this.copyTiledImageIntoProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/iconset.png", 39, 16);
+
+
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
                 assetLibrary.addImageAsset(titleImage);
@@ -91,6 +96,8 @@ public class NewProjectPage extends BorderPane {
                 assetLibrary.addSoundEffectAsset(buzzer1);
 
                 assetLibrary.addImageAsset(uiSkinImage);
+
+                assetLibrary.addIconPageAsset(defaultIconSet);
 
                 final FileHandle assetLibraryFile = projectFile.sibling(
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
@@ -115,6 +122,20 @@ public class NewProjectPage extends BorderPane {
         }
     }
 
+    private TiledImageAsset copyTiledImageIntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder,
+                                                            String internalPath, int rows, int columns) {
+        final String imagePath = this.copyInternalFileToAssetsFolder(projectFile, assetsFolder, internalPath);
+        return TiledImageAsset.createNewTiledImageAsset(imagePath, rows, columns);
+    }
+
+    private String copyInternalFileToAssetsFolder(FileHandle projectFile, FileHandle assetsFolder, String internalPath) {
+        final ApplicationContext context = ApplicationContext.context();
+        final FileHandle internalFile = context.files.internal(internalPath);
+        final FileHandle assetFile = assetsFolder.child(internalFile.name());
+        internalFile.copyTo(assetFile);
+        return AssetUtils.getFilePathRelativeTo(assetFile, projectFile.parent());
+    }
+
     private SoundAsset copyAudioToProjectFolder(FileHandle projectFile, FileHandle assetsFolder, String internalPath) {
         final ApplicationContext context = ApplicationContext.context();
         final FileHandle internalFile = context.files.internal(internalPath);
@@ -126,11 +147,7 @@ public class NewProjectPage extends BorderPane {
     }
 
     private ImageAsset copyImageIntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder, String path) {
-        final ApplicationContext context = ApplicationContext.context();
-        final FileHandle initialImageFile = context.files.internal(path);
-        final FileHandle imageAssetFile = assetsFolder.child(initialImageFile.name());
-        initialImageFile.copyTo(imageAssetFile);
-        final String imagePath = AssetUtils.getFilePathRelativeTo(imageAssetFile, projectFile.parent());
+        final String imagePath = this.copyInternalFileToAssetsFolder(projectFile, assetsFolder, path);
         return ImageAsset.generateNewImageAsset(imagePath);
     }
 
