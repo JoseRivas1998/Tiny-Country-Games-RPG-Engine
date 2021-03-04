@@ -1,4 +1,4 @@
-package com.tcg.rpgengine.editor.components;
+package com.tcg.rpgengine.editor.components.databasemanager.systemmanagerpages;
 
 import com.tcg.rpgengine.common.data.system.GlobalFlag;
 import com.tcg.rpgengine.editor.components.tableviews.GlobalFlagTableView;

@@ -1,4 +1,4 @@
-package com.tcg.rpgengine.editor.components;
+package com.tcg.rpgengine.editor.components.databasemanager.systemmanagerpages;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.AssetLibrary;

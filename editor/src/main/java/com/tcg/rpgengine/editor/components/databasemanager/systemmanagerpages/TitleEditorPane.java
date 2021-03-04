@@ -1,4 +1,4 @@
-package com.tcg.rpgengine.editor.components;
+package com.tcg.rpgengine.editor.components.databasemanager.systemmanagerpages;
 
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;

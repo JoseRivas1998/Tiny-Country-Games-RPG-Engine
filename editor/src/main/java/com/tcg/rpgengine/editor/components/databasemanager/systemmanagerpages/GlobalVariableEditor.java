@@ -1,4 +1,4 @@
-package com.tcg.rpgengine.editor.components;
+package com.tcg.rpgengine.editor.components.databasemanager.systemmanagerpages;
 
 import com.tcg.rpgengine.common.data.system.GlobalVariable;
 import com.tcg.rpgengine.common.data.system.SystemData;
