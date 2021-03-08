@@ -4,12 +4,16 @@ import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.BinaryDocument;
 import com.tcg.rpgengine.common.data.JSONDocument;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
+import org.json.JSONObject;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public abstract class TiledImageCell implements JSONDocument {
 
+    protected static final String JSON_IMAGE_ID_FIELD = "image_id";
+    protected static final String JSON_ROW_FIELD = "row";
+    protected static final String JSON_COLUMN_FIELD = "column";
     private UUID tiledImageId;
     private int row;
     private int column;
@@ -19,7 +23,8 @@ public abstract class TiledImageCell implements JSONDocument {
                 Objects.requireNonNull(tiledImageId));
         assetLibrary.incrementReferenceCount(tiledImageAsset);
         this.tiledImageId = tiledImageAsset.id;
-
+        this.setRow(assetLibrary, row);
+        this.setColumn(assetLibrary, column);
     }
 
     protected abstract TiledImageAsset getAssetFromAssetLibrary(AssetLibrary assetLibrary, UUID tiledImageId);
@@ -65,5 +70,14 @@ public abstract class TiledImageCell implements JSONDocument {
 
     public int getColumn() {
         return this.column;
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put(JSON_IMAGE_ID_FIELD, this.tiledImageId.toString());
+        jsonObject.put(JSON_ROW_FIELD, this.row);
+        jsonObject.put(JSON_COLUMN_FIELD, this.column);
+        return jsonObject;
     }
 }
