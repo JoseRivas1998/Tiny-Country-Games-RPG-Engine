@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
 import com.tcg.rpgengine.common.data.AssetLibrary;
+import com.tcg.rpgengine.common.data.database.Database;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.game.GameStateEngine;
 import com.tcg.rpgengine.gamestates.LoadingState;
@@ -25,6 +26,7 @@ public class TCGRPGGame extends ApplicationAdapter {
 	public AssetManager localAssetManager;
 	public AssetManager internalAssetManager;
 	public AssetLibrary assetLibrary;
+	public Database database;
 	public SystemData systemData;
 	public GameStateEngine stateEngine;
 	private final int logLevel;
@@ -47,6 +49,7 @@ public class TCGRPGGame extends ApplicationAdapter {
 		Controllers.addListener(new ControllerInputProcessor());
 
 		this.assetLibrary = AssetLibrary.newAssetLibrary();
+		this.database = new Database(this.assetLibrary);
 		this.stateEngine = new GameStateEngine();
 		this.stateEngine.setState(new LoadingState(this));
 	}

@@ -6,6 +6,7 @@ import com.tcg.rpgengine.common.data.JSONDocument;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -80,4 +81,18 @@ public abstract class TiledImageCell implements JSONDocument {
         jsonObject.put(JSON_COLUMN_FIELD, this.column);
         return jsonObject;
     }
+
+    public int numberOfBytes() {
+        return 3 * Integer.BYTES;
+    }
+
+    public byte[] toBytes(AssetTable<TiledImageAsset> assetTable) {
+        final ByteBuffer bytes = ByteBuffer.wrap(new byte[this.numberOfBytes()]);
+        final int idIndex = assetTable.insert(this.tiledImageId);
+        bytes.putInt(idIndex);
+        bytes.putInt(this.row);
+        bytes.putInt(this.column);
+        return bytes.array();
+    }
+
 }

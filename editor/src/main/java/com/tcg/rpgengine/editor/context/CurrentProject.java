@@ -3,6 +3,7 @@ package com.tcg.rpgengine.editor.context;
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.Project;
+import com.tcg.rpgengine.common.data.database.Database;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import javafx.stage.FileChooser;
 
@@ -15,12 +16,28 @@ public class CurrentProject {
     private final Project project;
     public final AssetLibrary assetLibrary;
     public final SystemData systemData;
+    public final Database database;
 
     private CurrentProject(String projectFilePath, Project project) {
         this.projectFilePath = projectFilePath;
         this.project = project;
         this.assetLibrary = this.loadAssetLibrary();
         this.systemData = this.loadSystemData();
+        this.database = this.loadDataBase();
+    }
+
+    private Database loadDataBase() {
+        final Database database = new Database(this.assetLibrary);
+        database.elements.loadFromJSON(this.getElementsFile().readString());
+        return database;
+    }
+
+    private FileHandle getElementsFile() {
+        return this.getDataFolder().child(ApplicationContext.Constants.ELEMENTS_FILE_NAME);
+    }
+
+    private FileHandle getDataFolder() {
+        return this.getProjectFileHandle().sibling(ApplicationContext.Constants.DATA_FOLDER_NAME);
     }
 
     private SystemData loadSystemData() {
@@ -57,6 +74,10 @@ public class CurrentProject {
 
     public void saveSystemData() {
         this.getSystemDataFileHandle().writeString(this.systemData.jsonString(4), false);
+    }
+
+    public void saveElements() {
+        this.getElementsFile().writeString(this.database.elements.jsonString(4), false);
     }
 
     static Optional<CurrentProject> selectAndOpenProject() {

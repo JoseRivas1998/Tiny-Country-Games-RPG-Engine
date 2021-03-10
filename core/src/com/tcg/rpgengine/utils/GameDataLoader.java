@@ -3,9 +3,13 @@ package com.tcg.rpgengine.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.TCGRPGGame;
+import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
+import com.tcg.rpgengine.common.data.database.Database;
+import com.tcg.rpgengine.common.data.database.entities.Element;
+import com.tcg.rpgengine.common.data.misc.AssetTable;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.common.utils.DataCompression;
 
@@ -72,6 +76,15 @@ public class GameDataLoader extends Thread{
         final FileHandle systemDataFile = Gdx.files.local("data/system.tcgdat");
         final ByteBuffer systemDataBytes = ByteBuffer.wrap(DataCompression.decompress(systemDataFile.readBytes()));
         this.game.systemData = SystemData.createFromBytes(this.game.assetLibrary, systemDataBytes);
+
+        final FileHandle elementsDataFile = Gdx.files.local("data/elements.tcgdat");
+        final ByteBuffer elementsBytes = ByteBuffer.wrap(DataCompression.decompress(elementsDataFile.readBytes()));
+        final AssetTable<TiledImageAsset> assetTable = AssetTable.fromBytes(AssetLibrary::getIconPageById,
+                elementsBytes);
+        while (elementsBytes.hasRemaining()) {
+            this.game.database.elements.add(Element.fromBytes(this.game.assetLibrary, assetTable, elementsBytes));
+        }
+
 
         Gdx.app.postRunnable(this.onCompletion);
     }

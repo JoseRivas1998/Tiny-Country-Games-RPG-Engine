@@ -6,6 +6,9 @@ import com.tcg.rpgengine.common.data.Project;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
+import com.tcg.rpgengine.common.data.database.Database;
+import com.tcg.rpgengine.common.data.database.entities.Element;
+import com.tcg.rpgengine.common.data.misc.IconCell;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.common.data.system.Title;
 import com.tcg.rpgengine.common.data.system.UISounds;
@@ -20,6 +23,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.Optional;
@@ -64,6 +69,7 @@ public class NewProjectPage extends BorderPane {
 
                 final FileHandle projectFile = this.generateProjectFile(projTitle, destination);
                 final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
+                final FileHandle dataFolder = projectFile.sibling(ApplicationContext.Constants.DATA_FOLDER_NAME);
 
                 final SoundAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
                 final ImageAsset titleImage = this.copyImageIntoProjectFolder(projectFile, assetsFolder,
@@ -113,6 +119,14 @@ public class NewProjectPage extends BorderPane {
                 final FileHandle systemFile = projectFile.sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
                 systemFile.writeString(systemData.jsonString(4), false);
 
+                final JSONObject initialContent = this.loadInitialContent(context);
+
+                final Database database = new Database(assetLibrary);
+                this.loadInitialElements(defaultIconSet, assetLibrary, initialContent, database);
+
+                final FileHandle elementsFile = dataFolder.child(ApplicationContext.Constants.ELEMENTS_FILE_NAME);
+                elementsFile.writeString(database.elements.jsonString(4), false);
+
                 ApplicationContext.context().openProject(projectFile);
             }
         } catch (Exception exception) {
@@ -120,6 +134,22 @@ public class NewProjectPage extends BorderPane {
             errorDialog.initOwner(context.primaryStage);
             errorDialog.showAndWait();
         }
+    }
+
+    private void loadInitialElements(TiledImageAsset defaultIconSet, AssetLibrary assetLibrary,
+                                     JSONObject initialContent, Database database) {
+        final JSONArray elements = initialContent.getJSONArray("elements");
+        for (int i = 0; i < elements.length(); i++) {
+            final JSONObject element = elements.getJSONObject(i);
+            final int row = element.getInt("row");
+            final int column = element.getInt("column");
+            final IconCell iconCell = IconCell.createNewIconCell(assetLibrary, defaultIconSet.id, row, column);
+            database.elements.add(Element.createNewElement(element.getString("name"), iconCell));
+        }
+    }
+
+    private JSONObject loadInitialContent(ApplicationContext context) {
+        return new JSONObject(context.files.internal("initial_assets/initial_content.json").readString());
     }
 
     private TiledImageAsset copyTiledImageIntoProjectFolder(FileHandle projectFile, FileHandle assetsFolder,

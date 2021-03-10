@@ -9,6 +9,7 @@ import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.common.utils.DataCompression;
 import com.tcg.rpgengine.editor.TestGameRunner;
 import com.tcg.rpgengine.editor.components.IconBar;
+import com.tcg.rpgengine.editor.concurrency.RunGameSequence;
 import com.tcg.rpgengine.editor.concurrency.TaskSequence;
 import com.tcg.rpgengine.editor.containers.AssetManagerPage;
 import com.tcg.rpgengine.editor.containers.DatabaseManagerPage;
@@ -134,67 +135,7 @@ public class ApplicationContext {
     public void playGame() {
         final Stage progressStage = new Stage();
 
-        final TaskSequence taskSequence = new TaskSequence();
-        final AssetLibrary assetLibrary = this.currentProject.assetLibrary;
-        taskSequence.addTask("Compiling Music", () -> {
-            this.copyAssetCollectionToLocal(assetLibrary.getAllMusicAssets(), soundAsset -> soundAsset.path);
-            final FileHandle musicDataFile = this.files.local("data/music.tcgdat");
-            final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.musicAssetBytes());
-            musicDataFile.writeBytes(compressedBytes, false);
-        });
-        taskSequence.addTask("Compiling Images", () -> {
-            this.copyAssetCollectionToLocal(assetLibrary.getAllImageAssets(), imageAsset -> imageAsset.path);
-            final FileHandle imageDataFile = this.files.local("data/images.tcgdat");
-            final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.imageAssetBytes());
-            imageDataFile.writeBytes(compressedBytes, false);
-        });
-        taskSequence.addTask("Compiling Sound Effects", () -> {
-            this.copyAssetCollectionToLocal(assetLibrary.getAllSoundEffectAssets(), soundAsset -> soundAsset.path);
-            final FileHandle soundDataFile = this.files.local("data/sound.tcgdat");
-            byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.soundAssetBytes());
-            soundDataFile.writeBytes(compressedBytes, false);
-        });
-        taskSequence.addTask("Compiling Spritesheet Pages", () -> {
-            this.copyAssetCollectionToLocal(assetLibrary.getAllSpritesheetPages(), TiledImageAsset::getPath);
-            final FileHandle spritesheetsDataFile = this.files.local("data/spritesheets.tcgdat");
-            final byte[] decompressedBytes = this.currentProject.assetLibrary.spritesheetPagesBytes();
-            final byte[] compressedBytes = DataCompression.compress(decompressedBytes);
-            spritesheetsDataFile.writeBytes(compressedBytes, false);
-        });
-        taskSequence.addTask("Compiling Tilesets", () -> {
-            this.copyAssetCollectionToLocal(assetLibrary.getAllTilesets(), TiledImageAsset::getPath);
-            final FileHandle tilesetsDataFile = this.files.local("data/tilesets.tcgdat");
-            final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.tilesetsBytes());
-            tilesetsDataFile.writeBytes(compressedBytes, false);
-        });
-        taskSequence.addTask("Compiling Icon Pages", () -> {
-            this.copyAssetCollectionToLocal(assetLibrary.getAllIconPages(), TiledImageAsset::getPath);
-            final FileHandle iconsDataFile = this.files.local("data/icons.tcgdat");
-            final byte[] compressedBytes = DataCompression.compress(this.currentProject.assetLibrary.iconPagesBytes());
-            iconsDataFile.writeBytes(compressedBytes, false);
-        });
-        taskSequence.addTask("Compiling System", () -> {
-            final FileHandle systemDataFile = this.files.local("data/system.tcgdat");
-            final byte[] compressedBytes = DataCompression.compress(this.currentProject.systemData.toBytes());
-            systemDataFile.writeBytes(compressedBytes, false);
-        });
-        taskSequence.addTask("Running Game", () -> {
-            try {
-                JavaProcess.exec(TestGameRunner.class, null);
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    final ErrorDialog errorDialog = new ErrorDialog(e);
-                    errorDialog.initOwner(progressStage);
-                    errorDialog.showAndWait();
-                });
-            }
-        });
-        taskSequence.addTask("Cleaning Up", () -> {
-            final FileHandle assetsFolder = this.files.local("assets/");
-            final FileHandle dataFolder = this.files.local("data/");
-            assetsFolder.deleteDirectory();
-            dataFolder.deleteDirectory();
-        });
+        final TaskSequence taskSequence = new RunGameSequence(progressStage);
 
         final ProgressBar progressBar = new ProgressBar();
         progressBar.progressProperty().bind(taskSequence.progressProperty());
@@ -219,15 +160,6 @@ public class ApplicationContext {
         taskSequence.start();
     }
 
-    private <T extends Asset> void copyAssetCollectionToLocal(Collection<T> assets, Function<T, String> pathCreator) {
-        assets.forEach(asset -> {
-            final String path = pathCreator.apply(asset);
-            final FileHandle sourceFile = this.currentProject.getProjectFileHandle().sibling(path);
-            final FileHandle targetFile = this.files.local(path);
-            sourceFile.copyTo(targetFile);
-        });
-    }
-
     private EventHandler<WindowEvent> defaultStageCloseEventListener() {
         return event -> {
             this.jukebox.stopAll();
@@ -248,6 +180,8 @@ public class ApplicationContext {
         public static final int ASSET_MANAGER_HEIGHT = 600;
         public static final int REQUIRED_WINDOW_SKIN_SIZE = 192;
         public static final String IMAGE_PREVIEW_BACKGROUND = "#000080";
+        public static final String DATA_FOLDER_NAME = "data/";
+        public static final String ELEMENTS_FILE_NAME = "elements.json";
     }
 
 }

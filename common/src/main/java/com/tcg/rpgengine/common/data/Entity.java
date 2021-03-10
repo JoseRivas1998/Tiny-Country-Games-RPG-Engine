@@ -1,26 +1,24 @@
-package com.tcg.rpgengine.common.data.assets;
+package com.tcg.rpgengine.common.data;
 
-import com.tcg.rpgengine.common.data.BinaryDocument;
-import com.tcg.rpgengine.common.data.Entity;
-import com.tcg.rpgengine.common.data.JSONDocument;
 import com.tcg.rpgengine.common.utils.UuidUtils;
 import org.json.JSONObject;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class Asset extends Entity implements BinaryDocument {
+public abstract class Entity implements JSONDocument {
 
-    public Asset(UUID id) {
-        super(id);
+    public final static int HEADER_NUMBER_OF_BYTES = UuidUtils.UUID_NUMBER_OF_BYTES;
+
+    protected static final String JSON_ID_FIELD = "id";
+    public final UUID id;
+
+    public Entity(UUID id) {
+        this.id = Objects.requireNonNull(id);
     }
 
     protected abstract void addAdditionalJSONData(JSONObject jsonObject);
-
-    protected abstract int contentLength();
-    protected abstract void encodeContent(ByteBuffer byteBuffer);
 
     @Override
     public JSONObject toJSON() {
@@ -28,19 +26,6 @@ public abstract class Asset extends Entity implements BinaryDocument {
         jsonObject.put(JSON_ID_FIELD, this.id.toString());
         this.addAdditionalJSONData(jsonObject);
         return jsonObject;
-    }
-
-    @Override
-    public int numberOfBytes() {
-        return Asset.HEADER_NUMBER_OF_BYTES + this.contentLength();
-    }
-
-    @Override
-    public byte[] toBytes() {
-        final ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[this.numberOfBytes()]);
-        byteBuffer.put(UuidUtils.toBytes(this.id));
-        this.encodeContent(byteBuffer);
-        return byteBuffer.array();
     }
 
     @Override
@@ -55,7 +40,7 @@ public abstract class Asset extends Entity implements BinaryDocument {
             if (obj == null || obj.getClass() != this.getClass()) {
                 result = false;
             } else {
-                final Asset other = (Asset) obj;
+                final Entity other = (Entity) obj;
                 result = this.id.equals(other.id);
             }
         }

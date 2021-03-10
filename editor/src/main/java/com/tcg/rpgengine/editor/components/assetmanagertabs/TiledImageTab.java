@@ -60,10 +60,10 @@ public abstract class TiledImageTab extends Tab {
     private void removeSelectedTiledImage(Window owner) {
         this.getSelectedTiledImage().ifPresent(tiledImageAsset -> {
             try {
+                this.removeFromAssetLibrary(tiledImageAsset);
                 final CurrentProject currentProject = ApplicationContext.context().currentProject;
                 final FileHandle imageFile = currentProject.getProjectFileHandle().sibling(tiledImageAsset.getPath());
                 imageFile.delete();
-                this.removeFromAssetLibrary(tiledImageAsset);
                 currentProject.saveAssetLibrary();
                 final int selectedIndex = this.tiledImageListView.getSelectionModel().getSelectedIndex();
                 this.tiledImageListView.getItems().remove(selectedIndex);
