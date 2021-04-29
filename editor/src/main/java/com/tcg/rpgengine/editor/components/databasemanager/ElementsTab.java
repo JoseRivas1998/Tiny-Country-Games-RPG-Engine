@@ -4,7 +4,6 @@ import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.common.data.database.Database;
 import com.tcg.rpgengine.common.data.database.entities.Element;
-import com.tcg.rpgengine.common.data.database.entitycollections.Elements;
 import com.tcg.rpgengine.common.data.misc.IconCell;
 import com.tcg.rpgengine.common.data.misc.RowColumnPair;
 import com.tcg.rpgengine.editor.components.IconButton;
@@ -12,7 +11,6 @@ import com.tcg.rpgengine.editor.components.SimpleEntityListView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.dialogs.TileSelectDialog;
-import javafx.beans.Observable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -25,7 +23,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class ElementsTab extends Tab {
@@ -56,28 +53,7 @@ public class ElementsTab extends Tab {
         editor.add(this.iconButton, 1, 1);
         HBox.setHgrow(editor, Priority.ALWAYS);
 
-        final Button removeBtn = new Button("Remove");
-        removeBtn.setOnAction(event -> {
-            this.getSelectedElement().ifPresent(selectedElement -> {
-                try {
-                    final ApplicationContext context = ApplicationContext.context();
-                    final AssetLibrary assetLibrary = context.currentProject.assetLibrary;
-                    final Database database = context.currentProject.database;
-                    database.elements.remove(assetLibrary, selectedElement);
-                    context.currentProject.saveElements();
-                    final int selectedIndex = this.elementListView.getSelectionModel().getSelectedIndex();
-                    this.elementListView.getItems().remove(selectedIndex);
-                    this.elementListView
-                            .getSelectionModel()
-                            .select(Math.min(selectedIndex, this.elementListView.getItems().size() - 1));
-                } catch (Exception e) {
-                    ErrorDialog.showErrorDialog(e, owner);
-                }
-            });
-        });
-        removeBtn.disableProperty().bind(this.elementListView.getSelectionModel().selectedItemProperty().isNull());
-
-        final HBox sideButtons = new HBox(5, this.buildAddBtn(owner), removeBtn);
+        final HBox sideButtons = new HBox(5, this.buildAddBtn(owner), this.buildRemoveButton(owner));
         sideButtons.setAlignment(Pos.CENTER_RIGHT);
 
         final VBox sidePanel = new VBox(5, this.elementListView, sideButtons);
@@ -86,6 +62,34 @@ public class ElementsTab extends Tab {
 
         this.setContent(layout);
 
+    }
+
+    private Button buildRemoveButton(Window owner) {
+        final Button removeBtn = new Button("Remove");
+        removeBtn.setOnAction(event -> this.removeSelectedElement(owner));
+        removeBtn.disableProperty().bind(this.elementListView.getSelectionModel().selectedItemProperty().isNull());
+        return removeBtn;
+    }
+
+    private void removeSelectedElement(Window owner) {
+        this.getSelectedElement().ifPresent(selectedElement -> this.removeElement(owner, selectedElement));
+    }
+
+    private void removeElement(Window owner, Element selectedElement) {
+        try {
+            final ApplicationContext context = ApplicationContext.context();
+            final AssetLibrary assetLibrary = context.currentProject.assetLibrary;
+            final Database database = context.currentProject.database;
+            database.elements.remove(assetLibrary, selectedElement);
+            context.currentProject.saveElements();
+            final int selectedIndex = this.elementListView.getSelectionModel().getSelectedIndex();
+            this.elementListView.getItems().remove(selectedIndex);
+            this.elementListView
+                    .getSelectionModel()
+                    .select(Math.min(selectedIndex, this.elementListView.getItems().size() - 1));
+        } catch (Exception e) {
+            ErrorDialog.showErrorDialog(e, owner);
+        }
     }
 
     private Button buildAddBtn(Window owner) {
