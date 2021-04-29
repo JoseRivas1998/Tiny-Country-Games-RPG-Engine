@@ -182,6 +182,7 @@ public class ApplicationContext {
         public static final String IMAGE_PREVIEW_BACKGROUND = "#000080";
         public static final String DATA_FOLDER_NAME = "data/";
         public static final String ELEMENTS_FILE_NAME = "elements.json";
+        public static final String ACTORS_FILE_NAME = "actors.json";
     }
 
 }

@@ -1,5 +1,6 @@
 package com.tcg.rpgengine.editor.containers;
 
+import com.tcg.rpgengine.editor.components.databasemanager.ActorsTab;
 import com.tcg.rpgengine.editor.components.databasemanager.ElementsTab;
 import com.tcg.rpgengine.editor.components.databasemanager.SystemManagerTab;
 import com.tcg.rpgengine.editor.components.databasemanager.systemmanagerpages.*;
@@ -18,7 +19,8 @@ public class DatabaseManagerPage extends TabPane {
         super();
         this.getTabs().setAll(
                 new SystemManagerTab(owner),
-                new ElementsTab(owner)
+                new ElementsTab(owner),
+                new ActorsTab(owner)
         );
     }
 

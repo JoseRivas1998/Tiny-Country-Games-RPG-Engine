@@ -7,8 +7,10 @@ import com.tcg.rpgengine.common.data.assets.ImageAsset;
 import com.tcg.rpgengine.common.data.assets.SoundAsset;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.common.data.database.Database;
+import com.tcg.rpgengine.common.data.database.entities.Actor;
 import com.tcg.rpgengine.common.data.database.entities.Element;
 import com.tcg.rpgengine.common.data.misc.IconCell;
+import com.tcg.rpgengine.common.data.misc.SpritesheetCharacter;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.common.data.system.Title;
 import com.tcg.rpgengine.common.data.system.UISounds;
@@ -91,6 +93,8 @@ public class NewProjectPage extends BorderPane {
                 final TiledImageAsset defaultIconSet = this.copyTiledImageIntoProjectFolder(projectFile, assetsFolder,
                         "initial_assets/iconset.png", 39, 16);
 
+                final TiledImageAsset terrySpritesheet = this.copyTiledImageIntoProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/terry_spritesheet.png", 1, 1);
 
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
@@ -104,6 +108,8 @@ public class NewProjectPage extends BorderPane {
                 assetLibrary.addImageAsset(uiSkinImage);
 
                 assetLibrary.addIconPageAsset(defaultIconSet);
+
+                assetLibrary.addSpritesheetPageAsset(terrySpritesheet);
 
                 final FileHandle assetLibraryFile = projectFile.sibling(
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
@@ -127,6 +133,10 @@ public class NewProjectPage extends BorderPane {
                 final FileHandle elementsFile = dataFolder.child(ApplicationContext.Constants.ELEMENTS_FILE_NAME);
                 elementsFile.writeString(database.elements.jsonString(4), false);
 
+                database.actors.add(this.createTerryActor(terrySpritesheet, assetLibrary));
+                final FileHandle actorsFile = dataFolder.child(ApplicationContext.Constants.ACTORS_FILE_NAME);
+                actorsFile.writeString(database.actors.jsonString(4), false);
+
                 ApplicationContext.context().openProject(projectFile);
             }
         } catch (Exception exception) {
@@ -134,6 +144,12 @@ public class NewProjectPage extends BorderPane {
             errorDialog.initOwner(context.primaryStage);
             errorDialog.showAndWait();
         }
+    }
+
+    private Actor createTerryActor(TiledImageAsset terrySpritesheet, AssetLibrary assetLibrary) {
+        final SpritesheetCharacter character = SpritesheetCharacter.createNewSpritesheetCharacter(assetLibrary,
+                terrySpritesheet.id, 0, 0);
+        return Actor.createNewActor("Terry", character);
     }
 
     private void loadInitialElements(TiledImageAsset defaultIconSet, AssetLibrary assetLibrary,

@@ -22,18 +22,27 @@ public class CurrentProject {
         this.projectFilePath = projectFilePath;
         this.project = project;
         this.assetLibrary = this.loadAssetLibrary();
-        this.systemData = this.loadSystemData();
         this.database = this.loadDataBase();
+        this.systemData = this.loadSystemData();
     }
 
     private Database loadDataBase() {
         final Database database = new Database(this.assetLibrary);
         database.elements.loadFromJSON(this.getElementsFile().readString());
+        database.actors.loadFromJSON(this.getActorsFile().readString());
         return database;
     }
 
+    private FileHandle getActorsFile() {
+        return this.getDataFile(ApplicationContext.Constants.ACTORS_FILE_NAME);
+    }
+
     private FileHandle getElementsFile() {
-        return this.getDataFolder().child(ApplicationContext.Constants.ELEMENTS_FILE_NAME);
+        return this.getDataFile(ApplicationContext.Constants.ELEMENTS_FILE_NAME);
+    }
+
+    private FileHandle getDataFile(String fileName) {
+        return this.getDataFolder().child(fileName);
     }
 
     private FileHandle getDataFolder() {
@@ -78,6 +87,10 @@ public class CurrentProject {
 
     public void saveElements() {
         this.getElementsFile().writeString(this.database.elements.jsonString(4), false);
+    }
+
+    public void saveActors() {
+        this.getActorsFile().writeString(this.database.actors.jsonString(4), false);
     }
 
     static Optional<CurrentProject> selectAndOpenProject() {
