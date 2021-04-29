@@ -4,10 +4,8 @@ import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.BinaryDocument;
 import com.tcg.rpgengine.common.data.Entity;
 import com.tcg.rpgengine.common.data.JSONCollection;
-import com.tcg.rpgengine.common.data.assets.Asset;
 import org.json.JSONArray;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -17,11 +15,16 @@ public abstract class DatabaseEntityCollection<E extends Entity> implements JSON
 
     private final Map<UUID, E> table;
     private final Map<UUID, Integer> referenceCount;
-    private List<ForeignKey<?>> foreignKeys;
+    private final List<ForeignKey<?>> foreignKeys;
 
     protected DatabaseEntityCollection() {
         this.table = new HashMap<>();
         this.referenceCount = new HashMap<>();
+        this.foreignKeys = new ArrayList<>();
+    }
+
+    public int size() {
+        return this.table.size();
     }
 
     public void add(E entity) {
@@ -50,18 +53,19 @@ public abstract class DatabaseEntityCollection<E extends Entity> implements JSON
         return this.table.containsKey(id);
     }
 
-    public void remove(E entity) {
+    public void remove(AssetLibrary assetLibrary, E entity) {
         Objects.requireNonNull(entity);
         if (this.table.containsKey(entity.id)) {
             this.throwIfReferenced(entity.id);
             this.decrementAllReferences(entity);
+            this.removeReferencesFromAssetLibrary(assetLibrary, entity);
             this.table.remove(entity.id);
             this.referenceCount.remove(entity.id);
         }
     }
 
-    public void clear() {
-        this.getAll().forEach(this::remove);
+    public void clear(AssetLibrary assetLibrary) {
+        this.getAll().forEach(e -> this.remove(assetLibrary, e));
     }
 
     public List<E> getAll() {

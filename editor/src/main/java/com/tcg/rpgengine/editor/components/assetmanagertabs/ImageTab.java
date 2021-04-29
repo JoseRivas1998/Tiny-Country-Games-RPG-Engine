@@ -2,7 +2,7 @@ package com.tcg.rpgengine.editor.components.assetmanagertabs;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
-import com.tcg.rpgengine.editor.components.SimpleAssetListView;
+import com.tcg.rpgengine.editor.components.SimpleEntityListView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.context.CurrentProject;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
@@ -10,17 +10,11 @@ import com.tcg.rpgengine.editor.dialogs.ImagePreviewDialog;
 import com.tcg.rpgengine.editor.utils.AssetUtils;
 import com.tcg.rpgengine.editor.utils.ExtensionUtils;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tab;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.io.File;
@@ -28,7 +22,7 @@ import java.util.Optional;
 
 public class ImageTab extends Tab {
 
-    private final SimpleAssetListView<ImageAsset> imageAssetListView;
+    private final SimpleEntityListView<ImageAsset> imageAssetListView;
     private final Button remove;
     private final Button preview;
 
@@ -159,9 +153,9 @@ public class ImageTab extends Tab {
         return selectedFileHandle;
     }
 
-    private SimpleAssetListView<ImageAsset> buildImageAssetListView() {
+    private SimpleEntityListView<ImageAsset> buildImageAssetListView() {
         final ApplicationContext context = ApplicationContext.context();
-        final SimpleAssetListView<ImageAsset> imageAssetListView = new SimpleAssetListView<>(image -> image.path);
+        final SimpleEntityListView<ImageAsset> imageAssetListView = new SimpleEntityListView<>(image -> image.path);
         imageAssetListView.getItems().setAll(context.currentProject.assetLibrary.getAllImageAssets());
         imageAssetListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             this.setAllButtonsDisable(Optional.ofNullable(newValue).isEmpty());

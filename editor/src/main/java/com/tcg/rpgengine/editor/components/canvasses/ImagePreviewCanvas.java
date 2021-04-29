@@ -9,14 +9,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class ImagePreviewCanvas extends ResizableCanvas{
-    protected final double imageAspectRatio;
-    protected final Image image;
+    protected double imageAspectRatio;
+    protected Image image;
     protected final Rectangle imageRect;
 
     public ImagePreviewCanvas(FileHandle image) {
         super();
-        this.image = new Image(image.read());
-        this.imageAspectRatio = this.image.getWidth() / this.image.getHeight();
+        this.setImage(image);
         this.imageRect = new Rectangle();
     }
 
@@ -48,6 +47,13 @@ public class ImagePreviewCanvas extends ResizableCanvas{
                 this.imageRect.getWidth(), this.imageRect.getHeight()
         );
 
+    }
+    
+    public void setImage(FileHandle image) {
+        final boolean shouldDraw = this.image != null;
+        this.image = new Image(image.read());
+        this.imageAspectRatio = this.image.getWidth() / this.image.getHeight();
+        if (shouldDraw) this.draw();
     }
 
     private double imageRectY(double paddedHeight) {

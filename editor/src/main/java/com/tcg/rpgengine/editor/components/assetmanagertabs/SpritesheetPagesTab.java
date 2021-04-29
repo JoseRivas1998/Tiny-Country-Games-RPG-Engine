@@ -1,30 +1,14 @@
 package com.tcg.rpgengine.editor.components.assetmanagertabs;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
-import com.tcg.rpgengine.editor.components.SimpleAssetListView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
-import com.tcg.rpgengine.editor.context.CurrentProject;
-import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.dialogs.SpritesheetDialog;
 import com.tcg.rpgengine.editor.dialogs.SpritesheetPreviewDialog;
-import com.tcg.rpgengine.editor.utils.AssetUtils;
-import com.tcg.rpgengine.editor.utils.ExtensionUtils;
-import javafx.beans.binding.BooleanBinding;
-import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Tab;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Window;
 import javafx.util.Pair;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 

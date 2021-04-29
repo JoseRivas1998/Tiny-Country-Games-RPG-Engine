@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.Window;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -43,6 +44,12 @@ public class ErrorDialog extends Alert {
         this.setTitle(title);
         this.setHeaderText(header);
         this.setContentText(content);
+    }
+
+    public static void showErrorDialog(Exception exception, Window owner) {
+        final ErrorDialog errorDialog = new ErrorDialog(exception);
+        errorDialog.initOwner(owner);
+        errorDialog.showAndWait();
     }
 
 }

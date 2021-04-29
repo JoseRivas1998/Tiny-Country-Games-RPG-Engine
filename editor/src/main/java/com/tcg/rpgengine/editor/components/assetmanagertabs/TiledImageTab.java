@@ -1,9 +1,8 @@
 package com.tcg.rpgengine.editor.components.assetmanagertabs;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
-import com.tcg.rpgengine.editor.components.SimpleAssetListView;
+import com.tcg.rpgengine.editor.components.SimpleEntityListView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.context.CurrentProject;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
@@ -26,7 +25,7 @@ import java.util.Optional;
 
 public abstract class TiledImageTab extends Tab {
 
-    protected final SimpleAssetListView<TiledImageAsset> tiledImageListView;
+    protected final SimpleEntityListView<TiledImageAsset> tiledImageListView;
 
     public TiledImageTab(Window owner, String title) {
         super(title);
@@ -145,8 +144,8 @@ public abstract class TiledImageTab extends Tab {
 
     protected abstract void addToAssetLibrary(TiledImageAsset tiledImage);
 
-    private SimpleAssetListView<TiledImageAsset> buildTiledImageListView() {
-        final SimpleAssetListView<TiledImageAsset> pageAssetSimpleAssetListView = new SimpleAssetListView<>(
+    private SimpleEntityListView<TiledImageAsset> buildTiledImageListView() {
+        final SimpleEntityListView<TiledImageAsset> pageAssetSimpleAssetListView = new SimpleEntityListView<>(
                 TiledImageAsset::getPath
         );
         pageAssetSimpleAssetListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

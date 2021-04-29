@@ -35,6 +35,14 @@ public class Elements extends DatabaseEntityCollection<Element>{
     }
 
     @Override
+    public void remove(AssetLibrary assetLibrary, Element entity) {
+        if (this.size() == 1) {
+            throw new IllegalStateException("There is only one element left and there cannot be zero.");
+        }
+        super.remove(assetLibrary, entity);
+    }
+
+    @Override
     public byte[] toBytes() {
         final List<Element> elements = this.getAll();
         final AssetTable<TiledImageAsset> assetTable = AssetTable.emptyAssetTable(AssetLibrary::getIconPageById);

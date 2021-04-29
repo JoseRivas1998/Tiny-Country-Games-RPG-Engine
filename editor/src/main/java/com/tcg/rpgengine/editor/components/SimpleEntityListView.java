@@ -1,5 +1,6 @@
 package com.tcg.rpgengine.editor.components;
 
+import com.tcg.rpgengine.common.data.Entity;
 import com.tcg.rpgengine.common.data.assets.Asset;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -9,9 +10,9 @@ import javafx.scene.control.SelectionMode;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class SimpleAssetListView<T extends Asset> extends ListView<T> {
+public class SimpleEntityListView<T extends Entity> extends ListView<T> {
 
-    public SimpleAssetListView(Function<T, String> nameFunction) {
+    public SimpleEntityListView(Function<T, String> nameFunction) {
         super();
         this.setCellFactory(param -> new SimpleAssetCell(nameFunction));
         this.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);

@@ -2,7 +2,7 @@ package com.tcg.rpgengine.editor.dialogs;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.assets.ImageAsset;
-import com.tcg.rpgengine.editor.components.SimpleAssetListView;
+import com.tcg.rpgengine.editor.components.SimpleEntityListView;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
@@ -14,7 +14,6 @@ import javafx.scene.layout.Region;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.UUID;
 
 public class SelectImageDialog extends Dialog<ImageAsset> {
 
@@ -23,7 +22,7 @@ public class SelectImageDialog extends Dialog<ImageAsset> {
         this.setHeaderText(null);
         this.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        final SimpleAssetListView<ImageAsset> imageAssetListView = new SimpleAssetListView<>(image -> image.path);
+        final SimpleEntityListView<ImageAsset> imageAssetListView = new SimpleEntityListView<>(image -> image.path);
         imageAssetListView.getItems().setAll(assets);
         imageAssetListView.getSelectionModel().select(initialImage);
         imageAssetListView.setMinWidth(Region.USE_PREF_SIZE);
