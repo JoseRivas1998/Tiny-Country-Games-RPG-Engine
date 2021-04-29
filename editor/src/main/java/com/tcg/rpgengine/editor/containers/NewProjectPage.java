@@ -29,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class NewProjectPage extends BorderPane {
@@ -120,10 +121,6 @@ public class NewProjectPage extends BorderPane {
                 final UISounds initialUiSounds = UISounds.createNewUISounds(assetLibrary, cursor2.id, decision1.id,
                         cancel1.id, buzzer1.id);
                 final WindowSkin windowSkin = WindowSkin.createWindowSkin(assetLibrary, uiSkinImage.id);
-                final SystemData systemData = SystemData.createNewSystemData(initialTitle, initialUiSounds, windowSkin);
-
-                final FileHandle systemFile = projectFile.sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
-                systemFile.writeString(systemData.jsonString(4), false);
 
                 final JSONObject initialContent = this.loadInitialContent(context);
 
@@ -136,6 +133,12 @@ public class NewProjectPage extends BorderPane {
                 database.actors.add(this.createTerryActor(terrySpritesheet, assetLibrary));
                 final FileHandle actorsFile = dataFolder.child(ApplicationContext.Constants.ACTORS_FILE_NAME);
                 actorsFile.writeString(database.actors.jsonString(4), false);
+
+                final SystemData systemData = SystemData.createNewSystemData(initialTitle, initialUiSounds, windowSkin,
+                        database.actors.getAll());
+
+                final FileHandle systemFile = projectFile.sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
+                systemFile.writeString(systemData.jsonString(4), false);
 
                 ApplicationContext.context().openProject(projectFile);
             }

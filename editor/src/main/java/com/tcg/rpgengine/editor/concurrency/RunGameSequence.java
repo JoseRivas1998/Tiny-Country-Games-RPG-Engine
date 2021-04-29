@@ -27,6 +27,7 @@ public class RunGameSequence extends TaskSequence{
         this.addTask("Compiling Icon Pages", this::compileIconPages);
         this.addTask("Compiling System", this::compileSystem);
         this.addTask("Compiling Elements", this::compileElements);
+        this.addTask("Compiling Actors", this::compileActors);
 
         this.addTask("Running Game", () -> this.runGame(progressStage));
 
@@ -51,6 +52,13 @@ public class RunGameSequence extends TaskSequence{
                 errorDialog.showAndWait();
             });
         }
+    }
+
+    private void compileActors() {
+        final ApplicationContext context = ApplicationContext.context();
+        final FileHandle actorsBytes = context.files.local("data/actors.tcgdat");
+        final byte[] compressedBytes = DataCompression.compress(context.currentProject.database.actors.toBytes());
+        actorsBytes.writeBytes(compressedBytes, false);
     }
 
     protected void compileElements() {

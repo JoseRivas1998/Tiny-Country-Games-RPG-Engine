@@ -73,17 +73,17 @@ public class GameDataLoader extends Thread{
             this.game.assetLibrary.addIconPageAsset(iconPage);
         }
 
-        final FileHandle systemDataFile = Gdx.files.local("data/system.tcgdat");
-        final ByteBuffer systemDataBytes = ByteBuffer.wrap(DataCompression.decompress(systemDataFile.readBytes()));
-        this.game.systemData = SystemData.createFromBytes(this.game.assetLibrary, systemDataBytes);
-
         final FileHandle elementsDataFile = Gdx.files.local("data/elements.tcgdat");
         final ByteBuffer elementsBytes = ByteBuffer.wrap(DataCompression.decompress(elementsDataFile.readBytes()));
-        final AssetTable<TiledImageAsset> assetTable = AssetTable.fromBytes(AssetLibrary::getIconPageById,
-                elementsBytes);
-        while (elementsBytes.hasRemaining()) {
-            this.game.database.elements.add(Element.fromBytes(this.game.assetLibrary, assetTable, elementsBytes));
-        }
+        this.game.database.elements.loadFromBytes(elementsBytes);
+
+        final FileHandle actorsDataFile = Gdx.files.local("data/actors.tcgdat");
+        final ByteBuffer actorsBytes = ByteBuffer.wrap(DataCompression.decompress(actorsDataFile.readBytes()));
+        this.game.database.actors.loadFromBytes(actorsBytes);
+
+        final FileHandle systemDataFile = Gdx.files.local("data/system.tcgdat");
+        final ByteBuffer systemDataBytes = ByteBuffer.wrap(DataCompression.decompress(systemDataFile.readBytes()));
+        this.game.systemData = SystemData.createFromBytes(this.game.assetLibrary, this.game.database, systemDataBytes);
 
 
         Gdx.app.postRunnable(this.onCompletion);

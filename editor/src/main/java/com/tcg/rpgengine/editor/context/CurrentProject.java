@@ -50,7 +50,7 @@ public class CurrentProject {
     }
 
     private SystemData loadSystemData() {
-        return SystemData.createFromJSON(this.assetLibrary, this.getSystemDataFileHandle().readString());
+        return SystemData.createFromJSON(this.assetLibrary, this.database, this.getSystemDataFileHandle().readString());
     }
 
     private FileHandle getSystemDataFileHandle() {
