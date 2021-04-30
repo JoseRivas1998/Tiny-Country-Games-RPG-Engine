@@ -85,7 +85,6 @@ public class TitleState implements GameState {
         this.buzzer = this.game.localAssetManager.get(buzzerAsset.path, Sound.class);
         this.selectTimeDuration = okAsset.duration;
 
-        this.titleMusic.setVolume(0.25f);
         this.titleMusic.play();
     }
 
