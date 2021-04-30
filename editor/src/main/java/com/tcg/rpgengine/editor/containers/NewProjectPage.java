@@ -36,10 +36,9 @@ import org.json.JSONObject;
 
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class NewProjectPage extends BorderPane {
 
@@ -83,6 +82,8 @@ public class NewProjectPage extends BorderPane {
                 final FileHandle assetsFolder = projectFile.sibling(ApplicationContext.Constants.ASSETS_FOLDER_NAME);
                 final FileHandle dataFolder = projectFile.sibling(ApplicationContext.Constants.DATA_FOLDER_NAME);
 
+                final JSONObject initialContent = this.loadInitialContent(context);
+
                 final SoundAsset theme6 = this.copyTheme6IntoProjectFolder(projectFile, assetsFolder);
                 final ImageAsset titleImage = this.copyImageIntoProjectFolder(projectFile, assetsFolder,
                         "initial_assets/title.png");
@@ -106,8 +107,16 @@ public class NewProjectPage extends BorderPane {
                 final TiledImageAsset terrySpritesheet = this.copyTiledImageIntoProjectFolder(projectFile, assetsFolder,
                         "initial_assets/terry_spritesheet.png", 1, 1);
 
-                final TiledImageAsset grasslandTileset = this.copyTiledImageIntoProjectFolder(projectFile, assetsFolder,
-                        "initial_assets/grassland.png", 18, 8);
+                final List<TiledImageAsset> tilesets = new ArrayList<>();
+                final JSONArray tilesetsArray = initialContent.getJSONArray("tilesets");
+
+                for (int i = 0; i < tilesetsArray.length(); i++) {
+                    final JSONObject tilesetJson = tilesetsArray.getJSONObject(i);
+                    final String path = tilesetJson.getString("path");
+                    final int rows = tilesetJson.getInt("rows");
+                    final int columns = tilesetJson.getInt("columns");
+                    tilesets.add(this.copyTiledImageIntoProjectFolder(projectFile, assetsFolder, path, rows, columns));
+                }
 
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
@@ -124,7 +133,7 @@ public class NewProjectPage extends BorderPane {
 
                 assetLibrary.addSpritesheetPageAsset(terrySpritesheet);
 
-                assetLibrary.addTilesetAsset(grasslandTileset);
+                tilesets.forEach(assetLibrary::addTilesetAsset);
 
                 final FileHandle assetLibraryFile = projectFile.sibling(
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
@@ -136,8 +145,6 @@ public class NewProjectPage extends BorderPane {
                         cancel1.id, buzzer1.id);
                 final WindowSkin windowSkin = WindowSkin.createWindowSkin(assetLibrary, uiSkinImage.id);
 
-                final JSONObject initialContent = this.loadInitialContent(context);
-
                 final Database database = new Database(assetLibrary);
                 this.loadInitialElements(defaultIconSet, assetLibrary, initialContent, database);
 
@@ -148,8 +155,11 @@ public class NewProjectPage extends BorderPane {
                 final FileHandle actorsFile = dataFolder.child(ApplicationContext.Constants.ACTORS_FILE_NAME);
                 actorsFile.writeString(database.actors.jsonString(4), false);
 
+                final List<UUID> tilesetIds = tilesets.stream()
+                        .map(tiledImageAsset -> tiledImageAsset.id).collect(Collectors.toList());
+                // Original values: 23, 40
                 final MapEntity map001 = MapEntity.createNewMap(assetLibrary, "map001",
-                        RowColumnPair.of(23, 40), Collections.singletonList(grasslandTileset.id),
+                        RowColumnPair.of(75, 75), tilesetIds,
                         tiledImageAsset -> {
                             final FileHandle imageFile = projectFile.sibling(tiledImageAsset.getPath());
                             final Dimension imageSize = AssetUtils.imageSize(imageFile);

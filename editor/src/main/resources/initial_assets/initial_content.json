@@ -5,5 +5,17 @@
       "row": 6,
       "column": 6
     }
+  ],
+  "tilesets": [
+    {
+      "path": "initial_assets/grassland.png",
+      "rows": 18,
+      "columns": 8
+    },
+    {
+      "path": "initial_assets/castle_town.png",
+      "rows": 30,
+      "columns": 8
+    }
   ]
 }

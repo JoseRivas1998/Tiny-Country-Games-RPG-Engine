@@ -148,7 +148,12 @@ public class MapLayer implements JSONDocument {
             for (neighborCoordinate.column = leftNeighbor;
                  neighborCoordinate.column <= rightNeighbor;
                  neighborCoordinate.column++) {
+                // Skip self
                 if (neighborCoordinate.row == mapCoordinate.row && neighborCoordinate.column == mapCoordinate.column) {
+                    continue;
+                }
+                // Skip diagonals
+                if (neighborCoordinate.row != mapCoordinate.row && neighborCoordinate.column != mapCoordinate.column) {
                     continue;
                 }
                 final int neighborIndex = this.mapCoordinateToIndex(neighborCoordinate);
@@ -157,8 +162,8 @@ public class MapLayer implements JSONDocument {
                         final MapLayerCell neighborCell = this.cells.get(neighborIndex);
                         // If both exist, and their tile matches, then they match, recurse on that neighbor
                         if (cell.getTilesetId().equals(neighborCell.getTilesetId()) &&
-                                cell.getTilesetCoordinate().row == neighborCell.getMapCoordinate().row &&
-                                cell.getTilesetCoordinate().column == neighborCell.getMapCoordinate().column) {
+                                cell.getTilesetCoordinate().row == neighborCell.getTilesetCoordinate().row &&
+                                cell.getTilesetCoordinate().column == neighborCell.getTilesetCoordinate().column) {
                             cellsToRecurse.add(neighborCoordinate.copy());
                         }
                     }

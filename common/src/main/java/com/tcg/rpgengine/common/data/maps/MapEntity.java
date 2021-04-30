@@ -177,6 +177,18 @@ public class MapEntity extends Entity implements BinaryDocument {
         this.name = Objects.requireNonNull(name);
     }
 
+    public RowColumnPair getMapSize() {
+        return this.mapSize.copy();
+    }
+
+    public List<MapLayer> getLayers() {
+        return new ArrayList<>(this.layers);
+    }
+
+    public void addLayer(String layerName) {
+        this.layers.add(MapLayer.createNewLayer(layerName, this.mapSize));
+    }
+
     @Override
     public byte[] toBytes() {
         final AssetTable<TiledImageAsset> assetTable = AssetTable.emptyAssetTable(AssetLibrary::getTilesetAssetById);
