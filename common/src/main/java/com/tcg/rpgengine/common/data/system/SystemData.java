@@ -21,6 +21,7 @@ public class SystemData implements JSONDocument, BinaryDocument {
     private static final String JSON_GLOBAL_VARIABLES_FIELD = "global_variables";
     private static final String JSON_GLOBAL_FLAGS_FIELD = "global_flags";
     private static final String JSON_INITITAL_PARTY_FIELD = "initial_party";
+    private static final String JSON_MAPS_FIELD = "maps";
     public final Title title;
     public final UISounds uiSounds;
     public final WindowSkin windowSkin;
@@ -32,12 +33,15 @@ public class SystemData implements JSONDocument, BinaryDocument {
 
     private final List<UUID> initialParty;
 
+    public final GameMaps maps;
+
     private SystemData(Title title,
                        UISounds uiSounds,
                        WindowSkin windowSkin,
                        Collection<GlobalVariable> globalVariables,
                        Collection<GlobalFlag> globalFlags,
-                       List<Actor> initialParty) {
+                       List<Actor> initialParty,
+                       List<UUID> maps) {
         this.title = Objects.requireNonNull(title);
         this.uiSounds = Objects.requireNonNull(uiSounds);
         this.windowSkin = Objects.requireNonNull(windowSkin);
@@ -55,12 +59,13 @@ public class SystemData implements JSONDocument, BinaryDocument {
             this.globalFlagReferenceCount.put(globalFlag.id, 0);
         }
         this.initialParty = initialParty.stream().map(actor -> actor.id).collect(Collectors.toList());
+        this.maps = GameMaps.createNewMapList(maps);
     }
 
     public static SystemData createNewSystemData(Title title, UISounds uiSounds, WindowSkin windowSkin,
-                                                 List<Actor> actors) {
+                                                 List<Actor> actors, List<UUID> maps) {
         return new SystemData(title, uiSounds, windowSkin, Collections.emptyList(), Collections.emptyList(),
-                actors);
+                actors, maps);
     }
 
     public static SystemData createFromJSON(AssetLibrary assetLibrary, Database database, String jsonString) {
@@ -73,7 +78,8 @@ public class SystemData implements JSONDocument, BinaryDocument {
         final List<GlobalVariable> globalVariables = SystemData.createGlobalVariableListFromJSON(jsonObject);
         final List<GlobalFlag> globalFlags = SystemData.createGlobalFlagsFromJSON(jsonObject);
         final List<Actor> initialParty = SystemData.getInitialPartyFromJSON(database, jsonObject);
-        return new SystemData(title, uiSounds, windowSkin, globalVariables, globalFlags, initialParty);
+        final List<UUID> gameMaps = GameMaps.fromJSON(jsonObject.getJSONArray(JSON_MAPS_FIELD).toString()).getAllMaps();
+        return new SystemData(title, uiSounds, windowSkin, globalVariables, globalFlags, initialParty, gameMaps);
     }
 
     private static List<Actor> getInitialPartyFromJSON(Database database, JSONObject jsonObject) {
@@ -114,7 +120,8 @@ public class SystemData implements JSONDocument, BinaryDocument {
         final List<GlobalVariable> globalVariables = SystemData.createGlobalVariablesFromBytes(bytes);
         final List<GlobalFlag> globalFlags = SystemData.createGlobalFlagsFromBytes(bytes);
         final List<Actor> initialParty = SystemData.getInitialPartyFromBytes(database, bytes);
-        return new SystemData(title, uiSounds, windowSkin, globalVariables, globalFlags, initialParty);
+        final List<UUID> maps = GameMaps.fromBinary(bytes).getAllMaps();
+        return new SystemData(title, uiSounds, windowSkin, globalVariables, globalFlags, initialParty, maps);
     }
 
     private static List<Actor> getInitialPartyFromBytes(Database database, ByteBuffer bytes) {
@@ -237,6 +244,7 @@ public class SystemData implements JSONDocument, BinaryDocument {
         jsonObject.put(JSON_GLOBAL_VARIABLES_FIELD, this.globalVariablesToJSONArray());
         jsonObject.put(JSON_GLOBAL_FLAGS_FIELD, this.globalFlagsToJSONArray());
         jsonObject.put(JSON_INITITAL_PARTY_FIELD, this.initialPartyToJSONArray());
+        jsonObject.put(JSON_MAPS_FIELD, this.maps.toJSON());
         return jsonObject;
     }
 
@@ -284,6 +292,7 @@ public class SystemData implements JSONDocument, BinaryDocument {
         for (UUID actorId : this.initialParty) {
             byteBuffer.put(UuidUtils.toBytes(actorId));
         }
+        byteBuffer.put(this.maps.toBytes());
         return byteBuffer.array();
     }
 
@@ -294,7 +303,8 @@ public class SystemData implements JSONDocument, BinaryDocument {
                 + this.windowSkin.numberOfBytes()
                 + this.calculateGlobalVariableByteCount()
                 + this.calculateGlobalFlagByteCount()
-                + this.calculateInitialPartyByteCount();
+                + this.calculateInitialPartyByteCount()
+                + this.maps.numberOfBytes();
     }
 
     private int calculateInitialPartyByteCount() {

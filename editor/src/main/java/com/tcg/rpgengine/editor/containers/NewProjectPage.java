@@ -9,7 +9,10 @@ import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
 import com.tcg.rpgengine.common.data.database.Database;
 import com.tcg.rpgengine.common.data.database.entities.Actor;
 import com.tcg.rpgengine.common.data.database.entities.Element;
+import com.tcg.rpgengine.common.data.maps.MapEntity;
+import com.tcg.rpgengine.common.data.misc.Float2;
 import com.tcg.rpgengine.common.data.misc.IconCell;
+import com.tcg.rpgengine.common.data.misc.RowColumnPair;
 import com.tcg.rpgengine.common.data.misc.SpritesheetCharacter;
 import com.tcg.rpgengine.common.data.system.SystemData;
 import com.tcg.rpgengine.common.data.system.Title;
@@ -20,6 +23,9 @@ import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
 import com.tcg.rpgengine.editor.utils.AssetUtils;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -28,8 +34,11 @@ import javafx.stage.DirectoryChooser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
 public class NewProjectPage extends BorderPane {
@@ -97,6 +106,9 @@ public class NewProjectPage extends BorderPane {
                 final TiledImageAsset terrySpritesheet = this.copyTiledImageIntoProjectFolder(projectFile, assetsFolder,
                         "initial_assets/terry_spritesheet.png", 1, 1);
 
+                final TiledImageAsset grasslandTileset = this.copyTiledImageIntoProjectFolder(projectFile, assetsFolder,
+                        "initial_assets/grassland.png", 18, 8);
+
                 final AssetLibrary assetLibrary = AssetLibrary.newAssetLibrary();
                 assetLibrary.addMusicAsset(theme6);
                 assetLibrary.addImageAsset(titleImage);
@@ -111,6 +123,8 @@ public class NewProjectPage extends BorderPane {
                 assetLibrary.addIconPageAsset(defaultIconSet);
 
                 assetLibrary.addSpritesheetPageAsset(terrySpritesheet);
+
+                assetLibrary.addTilesetAsset(grasslandTileset);
 
                 final FileHandle assetLibraryFile = projectFile.sibling(
                         ApplicationContext.Constants.ASSET_LIB_FILE_NAME
@@ -134,8 +148,18 @@ public class NewProjectPage extends BorderPane {
                 final FileHandle actorsFile = dataFolder.child(ApplicationContext.Constants.ACTORS_FILE_NAME);
                 actorsFile.writeString(database.actors.jsonString(4), false);
 
+                final MapEntity map001 = MapEntity.createNewMap(assetLibrary, "map001",
+                        RowColumnPair.of(23, 40), Collections.singletonList(grasslandTileset.id),
+                        tiledImageAsset -> {
+                            final FileHandle imageFile = projectFile.sibling(tiledImageAsset.getPath());
+                            final Dimension imageSize = AssetUtils.imageSize(imageFile);
+                            return Float2.of(imageSize.width, imageSize.height);
+                        });
+                final FileHandle map001JSONFile = projectFile.sibling("maps/" + map001.id + ".json");
+                map001JSONFile.writeString(map001.jsonString(4), false);
+
                 final SystemData systemData = SystemData.createNewSystemData(initialTitle, initialUiSounds, windowSkin,
-                        database.actors.getAll());
+                        database.actors.getAll(), Collections.singletonList(map001.id));
 
                 final FileHandle systemFile = projectFile.sibling(ApplicationContext.Constants.SYSTEM_FILE_NAME);
                 systemFile.writeString(systemData.jsonString(4), false);

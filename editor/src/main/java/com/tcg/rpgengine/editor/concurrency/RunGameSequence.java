@@ -4,19 +4,24 @@ import com.badlogic.gdx.files.FileHandle;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.assets.Asset;
 import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
+import com.tcg.rpgengine.common.data.maps.MapEntity;
 import com.tcg.rpgengine.common.utils.DataCompression;
 import com.tcg.rpgengine.editor.TestGameRunner;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 import com.tcg.rpgengine.editor.context.CurrentProject;
 import com.tcg.rpgengine.editor.dialogs.ErrorDialog;
+import com.tcg.rpgengine.editor.utils.AssetUtils;
 import com.tcg.rpgengine.editor.utils.JavaProcess;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
+import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
-public class RunGameSequence extends TaskSequence{
+public class RunGameSequence extends TaskSequence {
 
     public RunGameSequence(Stage progressStage) {
         this.addTask("Compiling Music", this::compileMusic);
@@ -28,18 +33,41 @@ public class RunGameSequence extends TaskSequence{
         this.addTask("Compiling System", this::compileSystem);
         this.addTask("Compiling Elements", this::compileElements);
         this.addTask("Compiling Actors", this::compileActors);
+        this.compileMaps();
 
         this.addTask("Running Game", () -> this.runGame(progressStage));
 
         this.addTask("Cleaning Up", this::cleanUp);
     }
 
+    private void compileMaps() {
+        final List<UUID> allMaps = ApplicationContext.context().currentProject.systemData.maps.getAllMaps();
+        allMaps.forEach(mapId -> this.addTask("Compiling Map: " + mapId, () -> this.compileMap(mapId)));
+    }
+
+    private void compileMap(UUID mapId) {
+        final ApplicationContext context = ApplicationContext.context();
+        final AssetLibrary assetLibrary = context.currentProject.assetLibrary;
+        final FileHandle projectFileHandle = context.currentProject.getProjectFileHandle();
+        final AssetUtils.TiledImageSizeSupplier imageSizeSupplier = new AssetUtils.TiledImageSizeSupplier();
+        final FileHandle mapFile = projectFileHandle.sibling(String.format("maps/%s.json", mapId));
+        if (!mapFile.exists()) {
+            throw new IllegalStateException("Map file for " + mapId + " not found");
+        }
+        final String mapJsonString = mapFile.readString();
+        final MapEntity map = MapEntity.ofJSON(assetLibrary, imageSizeSupplier, mapJsonString);
+        final FileHandle mapBinFile = context.files.local(String.format("maps/%s.tcgmap", map.id));
+        mapBinFile.writeBytes(DataCompression.compress(map.toBytes()), false);
+    }
+
     private void cleanUp() {
         final ApplicationContext context = ApplicationContext.context();
         final FileHandle assetsFolder = context.files.local("assets/");
         final FileHandle dataFolder = context.files.local("data/");
+        final FileHandle mapsFolder = context.files.local("maps/");
         assetsFolder.deleteDirectory();
         dataFolder.deleteDirectory();
+        mapsFolder.deleteDirectory();
     }
 
     private void runGame(Stage progressStage) {
@@ -139,5 +167,5 @@ public class RunGameSequence extends TaskSequence{
             sourceFile.copyTo(targetFile);
         });
     }
-    
+
 }

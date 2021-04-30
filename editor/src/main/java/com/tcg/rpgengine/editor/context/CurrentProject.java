@@ -114,7 +114,7 @@ public class CurrentProject {
     }
 
     static CurrentProject openProject(FileHandle projectFile) {
-        validateProjectFile(projectFile);
+        CurrentProject.validateProjectFile(projectFile);
         return new CurrentProject(projectFile.file().getAbsolutePath(),
                 Project.generateFromJSON(projectFile.readString()));
     }

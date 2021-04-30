@@ -4,6 +4,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
+import com.tcg.rpgengine.common.data.assets.TiledImageAsset;
+import com.tcg.rpgengine.common.data.misc.Float2;
 import com.tcg.rpgengine.editor.context.ApplicationContext;
 
 import javax.imageio.ImageIO;
@@ -12,6 +14,7 @@ import javax.imageio.stream.FileImageInputStream;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.function.Function;
 
 public interface AssetUtils {
 
@@ -69,6 +72,17 @@ public interface AssetUtils {
         final FileHandle assetFile = AssetUtils.getFileAsNonExistent(assetsFolder.child(assetFileName));
         externalFileHandle.copyTo(assetFile);
         return AssetUtils.getFilePathRelativeTo(assetFile, projectFileHandle.parent());
+    }
+
+    class TiledImageSizeSupplier implements Function<TiledImageAsset, Float2> {
+
+        @Override
+        public Float2 apply(TiledImageAsset tiledImageAsset) {
+            final FileHandle projectFileHandle = ApplicationContext.context().currentProject.getProjectFileHandle();
+            final FileHandle imageFile = projectFileHandle.sibling(tiledImageAsset.getPath());
+            final Dimension imageSize = AssetUtils.imageSize(imageFile);
+            return Float2.of(imageSize.width, imageSize.height);
+        }
     }
 
 }
