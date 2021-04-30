@@ -11,6 +11,8 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.width = GameConstants.VIEW_WIDTH;
 		config.height = GameConstants.VIEW_HEIGHT;
+		config.foregroundFPS = 0;
+		config.vSyncEnabled = false;
 		new LwjglApplication(new TCGRPGGame(Application.LOG_DEBUG), config);
 	}
 }

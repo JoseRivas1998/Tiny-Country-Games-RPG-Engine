@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.tcg.rpgengine.common.data.AssetLibrary;
 import com.tcg.rpgengine.common.data.database.Database;
 import com.tcg.rpgengine.common.data.system.SystemData;
@@ -23,6 +24,7 @@ import com.tcg.rpgengine.input.KeyboardInputProcessor;
 
 public class TCGRPGGame extends ApplicationAdapter {
 	public SpriteBatch batch;
+	public ShapeRenderer shapeRenderer;
 	public AssetManager localAssetManager;
 	public AssetManager internalAssetManager;
 	public AssetLibrary assetLibrary;
@@ -39,6 +41,7 @@ public class TCGRPGGame extends ApplicationAdapter {
 	public void create () {
 		Gdx.app.setLogLevel(this.logLevel);
 		this.batch = new SpriteBatch();
+		this.shapeRenderer = new ShapeRenderer();
 
 		this.localAssetManager = new AssetManager(new LocalFileHandleResolver());
 
@@ -52,6 +55,7 @@ public class TCGRPGGame extends ApplicationAdapter {
 		this.database = new Database(this.assetLibrary);
 		this.stateEngine = new GameStateEngine();
 		this.stateEngine.setState(new LoadingState(this));
+
 	}
 
 	private void initializeInternalFreetypeFontLoader() {
@@ -65,6 +69,7 @@ public class TCGRPGGame extends ApplicationAdapter {
 	public void render() {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 
 		final float deltaTime = Gdx.graphics.getDeltaTime();
 		this.stateEngine.step(deltaTime);
@@ -89,6 +94,7 @@ public class TCGRPGGame extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		this.batch.dispose();
+		this.shapeRenderer.dispose();
 		this.localAssetManager.dispose();
 		this.stateEngine.dispose();
 	}

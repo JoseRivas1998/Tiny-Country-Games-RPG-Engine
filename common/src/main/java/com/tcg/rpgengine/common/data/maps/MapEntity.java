@@ -88,6 +88,14 @@ public class MapEntity extends Entity implements BinaryDocument {
         return map;
     }
 
+    public static AssetTable<TiledImageAsset> assetTableFromBytes(AssetLibrary assetLibrary, byte[] bytes) {
+        final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        BinaryDocument.getUuid(buffer);
+        BinaryDocument.getUTF8String(buffer);
+        RowColumnPair.ofBytes(buffer);
+        return AssetTable.fromBytes(AssetLibrary::getTilesetAssetById, buffer);
+    }
+
     private Map<UUID, Character> buildTilesets(AssetLibrary assetLibrary, List<UUID> tilesetIds,
                                                Function<TiledImageAsset, Float2> imageSizeSupplier) {
         if (tilesetIds.isEmpty()) throw new IllegalArgumentException("There must be at least one tileset.");

@@ -5,7 +5,9 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
@@ -32,11 +34,13 @@ public class LoadingState implements GameState {
     private final TCGRPGGame game;
     private final AtomicBoolean decodingAssetData;
     private Viewport viewport;
-    private Texture splashImage;
     private Rectangle splashImageRect;
+    private Animation<TextureRegion> splashAnimation;
 
     private float currentStateTime;
     private LoadingStates currentState;
+
+    private float animationStateTime;
 
     public LoadingState(TCGRPGGame game) {
         this.game = game;
@@ -49,12 +53,23 @@ public class LoadingState implements GameState {
         this.viewport = new FitViewport(GameConstants.VIEW_WIDTH, GameConstants.VIEW_HEIGHT);
 
         final AssetDescriptor<Texture> splashImageDescriptor = new AssetDescriptor<>(
-                "badlogic.jpg", Texture.class);
+                "tcgrotate.png", Texture.class);
         this.game.internalAssetManager.load(splashImageDescriptor);
-        this.splashImage = this.game.internalAssetManager.finishLoadingAsset(splashImageDescriptor);
+        Texture splashImage = this.game.internalAssetManager.finishLoadingAsset(splashImageDescriptor);
+
+        final int tileWidth = splashImage.getWidth() / 4;
+        final int tileHeight = splashImage.getHeight() / 4;
+        final TextureRegion[][] animationMatrix = TextureRegion.split(splashImage, tileWidth, tileHeight);
+        final TextureRegion[] animationFrames = new TextureRegion[16];
+        for (int row = 0; row < 4; row++) {
+            System.arraycopy(animationMatrix[row], 0, animationFrames, row * 4, 4);
+        }
+        this.splashAnimation = new Animation<>(0.15f, animationFrames);
+
+        this.animationStateTime = 0;
 
         this.splashImageRect = new Rectangle();
-        this.splashImageRect.setSize(this.splashImage.getWidth(), this.splashImage.getHeight());
+        this.splashImageRect.setSize(tileWidth, tileHeight);
         this.splashImageRect.x = GameConstants.VIEW_WIDTH * 0.5f - this.splashImageRect.width * 0.5f;
         this.splashImageRect.y = GameConstants.VIEW_HEIGHT * 0.5f - this.splashImageRect.height * 0.5f;
 
@@ -149,9 +164,11 @@ public class LoadingState implements GameState {
 
     @Override
     public void draw(float delta) {
+        this.animationStateTime += delta;
+        final TextureRegion currentFrame = this.splashAnimation.getKeyFrame(this.animationStateTime, true);
         this.game.batch.begin();
         this.game.batch.setProjectionMatrix(this.viewport.getCamera().combined);
-        this.game.batch.draw(this.splashImage, this.splashImageRect.x, this.splashImageRect.y);
+        this.game.batch.draw(currentFrame, this.splashImageRect.x, this.splashImageRect.y);
         this.game.batch.end();
     }
 
